@@ -1,11 +1,178 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Portfolio | Desarrollador Web">
+	<main class="container mx-auto px-4 py-20 max-w-4xl">
+		
+		<!-- Hero Section -->
+		<section class="flex flex-col items-start justify-center min-h-[80vh] space-y-8">
+			<div class="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-emerald-300 text-sm font-medium backdrop-blur-md">
+				<span class="relative flex h-2 w-2">
+				  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+				  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+				</span>
+				Disponible para nuevos proyectos
+			</div>
+			<h1 class="reveal text-5xl md:text-8xl font-extrabold tracking-tight delay-100 leading-tight">
+				Hola, soy <br/>
+				<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">Tu Nombre.</span>
+			</h1>
+			<p class="reveal text-xl text-slate-400 max-w-2xl leading-relaxed delay-200 font-light">
+				Desarrollador Full Stack. Creo soluciones digitales minimalistas, funcionales y memorables.
+			</p>
+			<div class="reveal flex gap-4 pt-4 delay-300">
+				<a href="#proyectos" class="px-8 py-4 bg-white text-black rounded-full font-bold hover:bg-slate-200 transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+					Ver Proyectos
+				</a>
+				<a href="mailto:contacto@ejemplo.com" class="px-8 py-4 border border-white/20 hover:bg-white/10 rounded-full font-medium transition-all hover:scale-105 backdrop-blur-sm">
+					Contactar
+				</a>
+			</div>
+		</section>
+
+		<!-- Sobre Mí Section -->
+		<section id="sobre-mi" class="py-20">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+				<!-- Imagen con efecto Parallax Scroll (se mueve más lento que el resto) -->
+				<div class="reveal reveal-left relative group">
+					<div class="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+					<div class="relative rounded-2xl overflow-hidden aspect-square">
+						<img 
+							src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80" 
+							alt="Perfil profesional" 
+							class="object-cover w-full h-full"
+						/>
+					</div>
+				</div>
+				
+				<div class="reveal reveal-right space-y-6 delay-200">
+					<h2 class="text-4xl font-bold flex items-center gap-3 text-white">
+						<span class="w-12 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"></span>
+						Sobre mí
+					</h2>
+					<p class="text-slate-300 text-lg leading-relaxed">
+						Soy un desarrollador apasionado por la tecnología y el diseño limpio. Me encanta transformar ideas complejas en interfaces de usuario intuitivas y eficientes.
+					</p>
+					<p class="text-slate-300 text-lg leading-relaxed">
+						Cuando no estoy programando, me encontrarás explorando nuevas tecnologías, contribuyendo al código abierto o buscando la taza de café perfecta.
+					</p>
+					
+					<!-- Habilidades / Tech Stack -->
+					<div class="pt-4">
+						<h3 class="text-sm font-bold text-slate-400 mb-4 uppercase tracking-widest">Tech Stack</h3>
+						<div class="flex flex-wrap gap-3">
+							{['JavaScript', 'TypeScript', 'React', 'Astro', 'Node.js', 'Tailwind CSS', 'Git'].map((tech) => (
+								<span class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:border-cyan-500/30 hover:text-cyan-300 transition-all cursor-default hover:-translate-y-1">
+									{tech}
+								</span>
+							))}
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Experiencia Section -->
+		<section id="experiencia" class="py-20 relative">
+			<!-- Elemento decorativo flotante -->
+			<div class="absolute top-1/2 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] -z-10 parallax-scroll" data-scroll-speed="0.1"></div>
+
+			<h2 class="reveal text-4xl font-bold mb-16 flex items-center gap-3 text-white">
+				<span class="w-12 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
+				Experiencia
+			</h2>
+			<div class="space-y-12 border-l border-white/10 ml-3 pl-12 relative">
+				{[
+					{ title: "Senior Frontend Dev", company: "Tech Solutions Inc.", period: "2021 - Presente", desc: "Liderando el desarrollo de la nueva plataforma SaaS utilizando React y Next.js." },
+					{ title: "Full Stack Developer", company: "Creative Agency", period: "2019 - 2021", desc: "Desarrollo de sitios web corporativos y e-commerce con alto tráfico." },
+					{ title: "Junior Developer", company: "StartUp Local", period: "2018 - 2019", desc: "Mantenimiento de código legacy e implementación de nuevas features." }
+				].map((job, index) => (
+					<div class={`reveal ${index % 2 === 0 ? 'reveal-left' : 'reveal-right'} relative`} style={`transition-delay: ${index * 100}ms`}>
+						<span class="absolute -left-[55px] top-2 w-4 h-4 rounded-full border border-white/20 bg-slate-950 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+							<span class="absolute inset-0 rounded-full bg-blue-500 opacity-50 animate-ping"></span>
+							<span class="absolute inset-0 rounded-full bg-blue-500"></span>
+						</span>
+						<h3 class="text-2xl font-bold text-white mb-1">{job.title}</h3>
+						<div class="flex items-center gap-3 text-sm text-cyan-400 mb-4 font-medium tracking-wide">
+							<span>{job.company}</span>
+							<span>•</span>
+							<span>{job.period}</span>
+						</div>
+						<p class="text-slate-400 max-w-2xl leading-relaxed">{job.desc}</p>
+					</div>
+				))}
+			</div>
+		</section>
+
+		<!-- Proyectos Section -->
+		<section id="proyectos" class="py-20">
+			<h2 class="reveal text-4xl font-bold mb-16 flex items-center gap-3 text-white">
+				<span class="w-12 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></span>
+				Proyectos Destacados
+			</h2>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<!-- Card Proyecto 1 -->
+				<article class="reveal reveal-left group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 delay-100">
+					<div class="aspect-video w-full overflow-hidden">
+						<img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop" alt="Proyecto 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+					</div>
+					<div class="p-6">
+						<h3 class="text-2xl font-bold mb-3 text-white group-hover:text-purple-400 transition-colors">Proyecto Innovador</h3>
+						<p class="text-slate-400 mb-6 leading-relaxed">Una descripción breve de lo que hace este proyecto y el problema que resuelve.</p>
+						<div class="flex gap-2 text-xs text-blue-300">
+							<span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">Astro</span>
+							<span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">Tailwind</span>
+						</div>
+					</div>
+				</article>
+				
+				<!-- Card Proyecto 2 -->
+				<article class="reveal reveal-right group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300 delay-200">
+					<div class="aspect-video w-full overflow-hidden">
+						<img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop" alt="Proyecto 2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+					</div>
+					<div class="p-6">
+						<h3 class="text-2xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors">E-commerce Dashboard</h3>
+						<p class="text-slate-400 mb-6 leading-relaxed">Panel de administración completo con gráficos y gestión de usuarios.</p>
+						<div class="flex gap-2 text-xs text-blue-300">
+							<span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">React</span>
+							<span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">TypeScript</span>
+						</div>
+					</div>
+				</article>
+
+				<!-- Card Proyecto 3 -->
+				<article class="reveal reveal-left group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 delay-300">
+					<div class="aspect-video w-full overflow-hidden">
+						<img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=800&auto=format&fit=crop" alt="Proyecto 3" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+					</div>
+					<div class="p-6">
+						<h3 class="text-2xl font-bold mb-3 text-white group-hover:text-purple-400 transition-colors">App Mobile</h3>
+						<p class="text-slate-400 mb-6 leading-relaxed">Aplicación nativa para gestión de tareas y productividad.</p>
+						<div class="flex gap-2 text-xs text-blue-300">
+							<span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">React Native</span>
+							<span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">Firebase</span>
+						</div>
+					</div>
+				</article>
+
+				<!-- Card Proyecto 4 -->
+				<article class="reveal reveal-right group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300 delay-400">
+					<div class="aspect-video w-full overflow-hidden">
+						<img src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=800&auto=format&fit=crop" alt="Proyecto 4" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+					</div>
+					<div class="p-6">
+						<h3 class="text-2xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors">SaaS Platform</h3>
+						<p class="text-slate-400 mb-6 leading-relaxed">Plataforma de análisis de datos en tiempo real para empresas.</p>
+						<div class="flex gap-2 text-xs text-blue-300">
+							<span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">Vue.js</span>
+							<span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">Python</span>
+						</div>
+					</div>
+				</article>
+			</div>
+		</section>
+
+	</main>
 </Layout>
