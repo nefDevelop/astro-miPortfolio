@@ -1,13 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Projects from '../components/Projects.astro';
+import { personalInfo, about, skills, experience } from '../data/portfolio';
 ---
 
 <Layout title="Portfolio | Desarrollador Web">
-	<main class="container mx-auto px-4 py-20 max-w-4xl">
+	<canvas id="bg-canvas" class="fixed inset-0 -z-1 w-full h-full"></canvas>
+	<main>
+		<div class="container mx-auto px-4 pt-20 pb-0 max-w-4xl">
 		
 		<!-- Hero Section -->
-		<section class="flex flex-col items-start justify-center min-h-[80vh] space-y-8">
+		<section class="flex flex-col items-start justify-center min-h-[calc(100vh-5rem)] space-y-8">
 			<div class="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-emerald-300 text-sm font-medium backdrop-blur-md">
 				<span class="relative flex h-2 w-2">
 				  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -15,27 +18,27 @@ import Projects from '../components/Projects.astro';
 				</span>
 				Disponible para nuevos proyectos
 			</div>
-			<h1 class="reveal text-5xl md:text-8xl font-extrabold tracking-tight delay-100 leading-tight">
+			<h1 class="reveal text-5xl md:text-8xl font-extrabold tracking-tight delay-100 leading-tight mt-[264px]">
 				Soy <br/>
-				<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">Tu Nombre.</span>
+				<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">{personalInfo.name}</span><span id="target-dot" class="text-purple-600">.</span>
 			</h1>
 			<p class="reveal text-xl text-slate-400 max-w-2xl leading-relaxed delay-200 font-light">
-				Desarrollador Full Stack. Creo soluciones digitales minimalistas, funcionales y memorables.
+				{personalInfo.role}. {personalInfo.description}
 			</p>
-			<div class="reveal flex gap-6 pt-4 delay-300">
-				<a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-all hover:scale-110 flex items-center">
+			<nav class="reveal flex items-center gap-6 pt-4 delay-300" aria-label="Redes sociales">
+				<a href={personalInfo.social.github} target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-all hover:scale-110 flex items-center focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-full" aria-label="GitHub">
 					<span class="sr-only">GitHub</span>
 					<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
 				</a>
-				<a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-blue-400 transition-all hover:scale-110 flex items-center">
+				<a href={personalInfo.social.linkedin} target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-blue-400 transition-all hover:scale-110 flex items-center focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-full" aria-label="LinkedIn">
 					<span class="sr-only">LinkedIn</span>
 					<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"></path></svg>
 				</a>
-				<a href="mailto:contacto@ejemplo.com" class="text-slate-400 hover:text-emerald-400 transition-all hover:scale-110 flex items-center">
+				<a href={personalInfo.social.email} class="text-slate-400 hover:text-emerald-400 transition-all hover:scale-110 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-full" aria-label="Email">
 					<span class="sr-only">Email</span>
-					<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+					<svg class="w-9 h-9" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path></svg>
 				</a>
-			</div>
+			</nav>
 		</section>
 
 		<!-- Sobre Mí Section -->
@@ -47,7 +50,7 @@ import Projects from '../components/Projects.astro';
 					<div class="relative rounded-2xl overflow-hidden aspect-square">
 						<img 
 							src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80" 
-							alt="Perfil profesional" 
+							alt={`Foto de perfil de ${personalInfo.name}`}
 							class="object-cover w-full h-full"
 						/>
 					</div>
@@ -59,17 +62,17 @@ import Projects from '../components/Projects.astro';
 						Sobre mí
 					</h2>
 					<p class="text-slate-300 text-lg leading-relaxed">
-						Soy un desarrollador apasionado por la tecnología y el diseño limpio. Me encanta transformar ideas complejas en interfaces de usuario intuitivas y eficientes.
+						{about.description_1}
 					</p>
 					<p class="text-slate-300 text-lg leading-relaxed">
-						Cuando no estoy programando, me encontrarás explorando nuevas tecnologías, contribuyendo al código abierto o buscando la taza de café perfecta.
+						{about.description_2}
 					</p>
 					
 					<!-- Habilidades / Tech Stack -->
 					<div class="pt-4">
 						<h3 class="text-sm font-bold text-slate-400 mb-4 uppercase tracking-widest">Tech Stack</h3>
 						<div class="flex flex-wrap gap-3">
-							{['JavaScript', 'TypeScript', 'React', 'Astro', 'Node.js', 'Tailwind CSS', 'Git'].map((tech) => (
+							{skills.map((tech) => (
 								<span class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:border-cyan-500/30 hover:text-cyan-300 transition-all cursor-default hover:-translate-y-1">
 									{tech}
 								</span>
@@ -90,13 +93,9 @@ import Projects from '../components/Projects.astro';
 				Experiencia
 			</h2>
 			<div class="space-y-12 border-l border-white/10 ml-3 pl-12 relative">
-				{[
-					{ title: "Senior Frontend Dev", company: "Tech Solutions Inc.", period: "2021 - Presente", desc: "Liderando el desarrollo de la nueva plataforma SaaS utilizando React y Next.js." },
-					{ title: "Full Stack Developer", company: "Creative Agency", period: "2019 - 2021", desc: "Desarrollo de sitios web corporativos y e-commerce con alto tráfico." },
-					{ title: "Junior Developer", company: "StartUp Local", period: "2018 - 2019", desc: "Mantenimiento de código legacy e implementación de nuevas features." }
-				].map((job, index) => (
-					<div class={`reveal ${index % 2 === 0 ? 'reveal-left' : 'reveal-right'} relative`} style={`transition-delay: ${index * 100}ms`}>
-						<span class="absolute -left-[55px] top-2 w-4 h-4 rounded-full border border-white/20 bg-slate-950 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+				{experience.map((job, index) => (
+					<article class={`reveal ${index % 2 === 0 ? 'reveal-left' : 'reveal-right'} relative`} style={`transition-delay: ${index * 100}ms`}>
+						<span class="absolute -left-14 top-2 w-4 h-4 rounded-full border border-white/20 bg-slate-950 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
 							<span class="absolute inset-0 rounded-full bg-blue-500 opacity-50 animate-ping"></span>
 							<span class="absolute inset-0 rounded-full bg-blue-500"></span>
 						</span>
@@ -107,19 +106,220 @@ import Projects from '../components/Projects.astro';
 							<span>{job.period}</span>
 						</div>
 						<p class="text-slate-400 max-w-2xl leading-relaxed">{job.desc}</p>
-					</div>
+					</article>
 				))}
 			</div>
 		</section>
 
 		<!-- Proyectos Header -->
-		<section id="proyectos" class="pt-20 pb-10">
+		<section id="proyectos" class="pt-20 pb-4">
 			<h2 class="reveal text-4xl font-bold mb-6 flex items-center gap-3 text-white">
 				<span class="w-12 h-1 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full"></span>
 				Proyectos Destacados
 			</h2>
 		</section>
-
+		</div>
+		
+		<Projects />
+		
+		<footer class="reveal py-10 text-center text-slate-400 text-sm">
+			<p>&copy; {new Date().getFullYear()} {personalInfo.name}. Todos los derechos reservados.</p>
+		</footer>
 	</main>
-	<Projects />
+
+	<script>
+		const canvas = document.getElementById('bg-canvas') as HTMLCanvasElement;
+		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+		
+		let width = 0;
+		let height = 0;
+		let scrollY = 0;
+		let dots: {x: number, y: number}[] = [];
+		
+		// Configuración
+		const DOT_SPACING = 30;
+		const LINE_SPEED = 2;
+		
+		class Tracer {
+			x: number;
+			y: number;
+			targetX: number;
+			targetY: number;
+			dirX: number;
+			dirY: number;
+			color: string;
+			history: {x: number, y: number}[];
+			maxHistory: number;
+
+			constructor(color: string) {
+				this.color = color;
+				this.x = 0;
+				this.y = 0;
+				this.targetX = 0;
+				this.targetY = 0;
+				this.dirX = 0;
+				this.dirY = 0;
+				this.history = [];
+				this.maxHistory = 15;
+				this.reset();
+			}
+			
+			reset() {
+				this.x = Math.floor(Math.random() * (width / DOT_SPACING)) * DOT_SPACING;
+				this.y = Math.floor(Math.random() * (height / DOT_SPACING)) * DOT_SPACING;
+				this.targetX = this.x;
+				this.targetY = this.y;
+				this.dirX = 0;
+				this.dirY = 0;
+				this.history = [];
+				this.maxHistory = 15;
+			}
+			
+			update() {
+				const dx = this.targetX - this.x;
+				const dy = this.targetY - this.y;
+				const dist = Math.sqrt(dx * dx + dy * dy);
+				
+				if (dist < LINE_SPEED) {
+					this.x = this.targetX;
+					this.y = this.targetY;
+					
+					this.history.push({x: this.x, y: this.y});
+					if (this.history.length > this.maxHistory) this.history.shift();
+					
+					const directions = [
+						{dx: DOT_SPACING, dy: 0},
+						{dx: -DOT_SPACING, dy: 0},
+						{dx: 0, dy: DOT_SPACING},
+						{dx: 0, dy: -DOT_SPACING}
+					];
+					
+					// Filtrar dirección opuesta para evitar giros de 180 grados
+					const validDirections = directions.filter(d => 
+						this.dirX === 0 && this.dirY === 0 ? true : !(d.dx === -this.dirX && d.dy === -this.dirY)
+					);
+
+					// Intentar encontrar una dirección válida
+					let validDir = false;
+					let attempts = 0;
+					while (!validDir && attempts < 10) {
+						let dir;
+						// 80% de probabilidad de mantener la dirección (inercia) para hacerlas más directas
+						if ((this.dirX !== 0 || this.dirY !== 0) && Math.random() < 0.8) {
+							dir = { dx: this.dirX, dy: this.dirY };
+						} else {
+							dir = validDirections[Math.floor(Math.random() * validDirections.length)];
+						}
+
+						const nextX = this.x + dir.dx;
+						const nextY = this.y + dir.dy;
+						
+						if (nextX >= 0 && nextX <= width && nextY >= 0 && nextY <= height) {
+							this.targetX = nextX;
+							this.targetY = nextY;
+							this.dirX = dir.dx;
+							this.dirY = dir.dy;
+							validDir = true;
+						} else {
+							this.dirX = 0;
+							this.dirY = 0;
+						}
+						attempts++;
+					}
+				} else {
+					this.x += (dx / dist) * LINE_SPEED;
+					this.y += (dy / dist) * LINE_SPEED;
+				}
+			}
+			
+			draw(ctx: CanvasRenderingContext2D, mapY: (y: number) => number) {
+				ctx.beginPath();
+				const allPoints = [...this.history, {x: this.x, y: this.y}];
+				
+				if (allPoints.length > 0) {
+					const startY = mapY(allPoints[0].y);
+					ctx.moveTo(allPoints[0].x, startY);
+					
+					for (let i = 1; i < allPoints.length; i++) {
+						const currY = mapY(allPoints[i].y);
+						const prevY = mapY(allPoints[i-1].y);
+						
+						// Si la distancia es muy grande, es porque hubo un salto por el wrapping (paralaje infinito)
+						if (Math.abs(currY - prevY) > height / 2) {
+							ctx.moveTo(allPoints[i].x, currY);
+						} else {
+							ctx.lineTo(allPoints[i].x, currY);
+						}
+					}
+				}
+				
+				ctx.strokeStyle = this.color;
+				ctx.lineWidth = 2;
+				ctx.lineCap = 'round';
+				ctx.lineJoin = 'round';
+				ctx.shadowColor = this.color;
+				ctx.shadowBlur = 8;
+				ctx.stroke();
+				ctx.shadowBlur = 0;
+			}
+		}
+
+		let tracers: Tracer[] = [];
+
+		function resize() {
+			width = window.innerWidth;
+			height = window.innerHeight;
+			canvas.width = width;
+			canvas.height = height;
+			
+			dots = [];
+			for (let x = 0; x < width; x += DOT_SPACING) {
+				for (let y = 0; y < height; y += DOT_SPACING) {
+					dots.push({x, y});
+				}
+			}
+		}
+
+		function init() {
+			resize();
+			window.addEventListener('resize', resize);
+			window.addEventListener('scroll', () => scrollY = window.scrollY);
+			
+			tracers = [
+				new Tracer('#1e293b'), // Slate 800 (Gris más oscuro)
+				new Tracer('#0f172a')  // Slate 900 (Casi negro)
+			];
+			
+			animate();
+		}
+
+		function animate() {
+			ctx.clearRect(0, 0, width, height);
+
+			// Función para mapear Y con paralaje y wrapping infinito
+			const parallaxSpeed = 0.2;
+			const getScreenY = (y: number) => {
+				let sy = (y - scrollY * parallaxSpeed) % height;
+				if (sy < 0) sy += height;
+				return sy;
+			};
+			
+			// Dibujar puntos
+			ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+			ctx.beginPath();
+			dots.forEach(dot => {
+				ctx.rect(dot.x, getScreenY(dot.y), 2, 2);
+			});
+			ctx.fill();
+			
+			tracers.forEach(tracer => {
+				tracer.update();
+				tracer.draw(ctx, getScreenY);
+			});
+			
+			requestAnimationFrame(animate);
+		}
+
+		init();
+	</script>
 </Layout>

@@ -1,9 +1,10 @@
 ---
 interface Props {
 	title: string;
+	showSplash?: boolean;
 }
 
-const { title } = Astro.props;
+const { title, showSplash = true } = Astro.props;
 ---
 
 <!doctype html>
@@ -32,10 +33,6 @@ const { title } = Astro.props;
 	</head>
 	<body class="bg-[#0a0a0a] text-slate-200 font-['Onest',sans-serif] antialiased selection:bg-cyan-500 selection:text-black overflow-x-hidden">
 		<div class="fixed top-0 left-0 z-[-2] h-full w-full bg-[#0a0a0a] overflow-hidden">
-			<!-- Fondo de puntos (Dot Pattern) -->
-			<div class="absolute inset-0 h-full w-full opacity-0 animate-fade-in-dots">
-				<div class="absolute inset-0 h-full w-full bg-[radial-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:24px_24px] animate-dots-move"></div>
-			</div>
 			<div class="absolute top-0 z-[-2] h-screen w-screen bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
 			<!-- Cuadrados grandes decorativos -->
 			<div class="absolute -top-40 -left-40 w-[500px] h-[500px] bg-white/5 rounded-[3rem] blur-2xl animate-float-1"></div>
@@ -43,13 +40,21 @@ const { title } = Astro.props;
 		</div>
 
 		<!-- Intro / Splash Screen -->
-		<div id="splash" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a0a0a] transition-all duration-1000">
-			<h1 id="splash-text" class="text-6xl md:text-9xl font-bold text-white tracking-tighter opacity-0 translate-y-10 transition-all duration-1000 ease-out">Hola.</h1>
-		</div>
+		{showSplash && (
+			<div id="splash" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a0a0a] transition-all duration-1000">
+				<h1 id="splash-text" class="text-5xl md:text-8xl font-extrabold text-white tracking-tight opacity-0 translate-y-10 transition-all duration-1000 ease-out mt-[198px]">Hola.</h1>
+			</div>
+		)}
 
 		<slot />
 
 		<style is:global>
+			/* Accesibilidad: Focus Visible Global */
+			:focus-visible {
+				outline: 2px solid #22d3ee; /* cyan-400 */
+				outline-offset: 2px;
+			}
+
 			/* Animación Scroll Reveal */
 			.reveal {
 				opacity: 0;
@@ -58,13 +63,13 @@ const { title } = Astro.props;
 			
 			/* Direcciones de entrada */
 			.reveal:not(.reveal-left):not(.reveal-right) {
-				transform: translateY(50px); /* Por defecto: viene de abajo */
+				transform: translateY(3rem); /* Por defecto: viene de abajo */
 			}
 			.reveal-left {
-				transform: translateX(-100px); /* Viene de la izquierda */
+				transform: translateX(-6rem); /* Viene de la izquierda */
 			}
 			.reveal-right {
-				transform: translateX(100px); /* Viene de la derecha */
+				transform: translateX(6rem); /* Viene de la derecha */
 			}
 
 			.reveal.active {
@@ -96,6 +101,7 @@ const { title } = Astro.props;
 				height: 100%;
 				opacity: 0;
 				will-change: opacity;
+				transition: opacity 0.6s ease-in-out;
 			}
 
 			/* Animaciones de fondo */
@@ -128,10 +134,25 @@ const { title } = Astro.props;
 
 			@keyframes dotsMove {
 				0% { background-position: 0 0; }
-				100% { background-position: 24px 24px; }
+				100% { background-position: 1.5rem 1.5rem; }
 			}
 			.animate-dots-move {
 				animation: dotsMove 3s linear infinite;
+			}
+
+			@keyframes shake-fill {
+				0% { transform: scale(1); color: white; }
+				10% { transform: scale(1.5) translate(-2px); color: #22d3ee; }
+				20% { transform: scale(1.5) translate(2px); color: #22d3ee; }
+				30% { transform: scale(1.5) translate(-2px); color: #a855f7; }
+				40% { transform: scale(1.5) translate(2px); color: #a855f7; }
+				50% { transform: scale(1.5) translate(-2px); color: #22d3ee; }
+				60% { transform: scale(1.5) translate(2px); color: #22d3ee; }
+				70% { transform: scale(1.5) translate(0); color: #a855f7; }
+				100% { transform: scale(1); color: #9333ea; }
+			}
+			.dot-anim {
+				animation: shake-fill 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 			}
 		</style>
 
@@ -151,10 +172,10 @@ const { title } = Astro.props;
 			}, { threshold: 0.1 });
 
 			// Lógica del Splash Screen y Observador
-			document.addEventListener('DOMContentLoaded', () => {
+			document.addEventListener('DOMContentLoaded', async () => {
 				const splash = document.getElementById('splash');
 				const splashText = document.getElementById('splash-text');
-
+				const targetDot = document.getElementById('target-dot');
 				if (!splash || !splashText) return;
 
 				// Detectar idioma del navegador
@@ -167,28 +188,105 @@ const { title } = Astro.props;
 					it: 'Ciao.',
 					pt: 'Olá.'
 				};
-				splashText.innerText = greetings[lang] || 'Hello.';
+				const text = greetings[lang] || '\nHello.';
+				splashText.innerHTML = `<span id="splash-word" class="inline-block transition-all duration-1000 ease-out">${text.slice(0, -1)}</span><span id="splash-dot" class="inline-block transition-all duration-1000 ease-out">${text.slice(-1)}</span>`;
+
+				const splashDot = document.getElementById('splash-dot');
+
+				// Esperar a que las fuentes carguen para cálculos precisos
+				await document.fonts.ready;
 
 				// Bloquear scroll durante la intro
 				document.body.style.overflow = 'hidden';
 
+				// Alineación vertical precisa
+				if (targetDot && splashDot) {
+					// 1. Medir posición destino
+					let targetTop = 0;
+					const revealParent = targetDot.closest('.reveal') as HTMLElement | null;
+					if (revealParent) {
+						const prevTransform = revealParent.style.transform;
+						revealParent.style.transform = 'none';
+						targetTop = targetDot.getBoundingClientRect().top;
+						revealParent.style.transform = prevTransform;
+					} else {
+						targetTop = targetDot.getBoundingClientRect().top;
+					}
+
+					// 2. Posicionar splashText
+					splashText.style.marginTop = '0';
+					splashText.style.position = 'absolute';
+					splashText.style.width = '100%';
+					splashText.style.textAlign = 'center';
+					
+					// Calcular offset interno del punto
+					splashText.classList.remove('translate-y-10');
+					const dotTop = splashDot.getBoundingClientRect().top;
+					const textTop = splashText.getBoundingClientRect().top;
+					const internalOffset = dotTop - textTop;
+					
+					// Aplicar posición final
+					splashText.style.top = `${targetTop - internalOffset}px`;
+					splashText.classList.add('translate-y-10');
+				}
+
 				// 1. Entrada del texto "Hola"
 				setTimeout(() => {
-					splashText.classList.remove('opacity-0', 'translate-y-10');
+					splashText.style.transition = ''; // Restaurar transición
+					splashText.classList.remove('opacity-0');
+					splashText.classList.remove('translate-y-10');
 				}, 200);
+
+				// 1.5. Animación del punto (Shake & Fill)
+				setTimeout(() => {
+					const dot = document.getElementById('splash-dot');
+					if (dot) dot.classList.add('dot-anim');
+				}, 1000);
 
 				// 2. Salida del Splash y activación de animaciones del contenido
 				setTimeout(() => {
 					// Calcular posición del título principal para mover el "Hola" allí
-					const mainTitle = document.querySelector('h1');
-					if (mainTitle) {
-						const splashRect = splashText.getBoundingClientRect();
-						const mainRect = mainTitle.getBoundingClientRect();
-						// Ajustamos la posición restando el transform inicial del .reveal (50px)
-						const targetX = mainRect.left - splashRect.left;
-						const targetY = mainRect.top - splashRect.top - 50;
+					const splashWord = document.getElementById('splash-word');
+
+					if (targetDot && splashDot && splashWord && splash) {
+						const splashRect = splashDot.getBoundingClientRect();
+						const targetRect = targetDot.getBoundingClientRect();
+						const revealParent = targetDot.closest('.reveal');
 						
-						splashText.style.transform = `translate(${targetX}px, ${targetY}px) scale(0.8)`;
+						// 1. Mover el punto a su destino final
+						splashDot.classList.remove('dot-anim'); // Detener animación previa
+						splashDot.style.color = '#9333ea'; // Asegurar color final (purple-600)
+						
+						// Usar posición fixed para la transición para evitar problemas de contexto
+						splashDot.style.position = 'fixed';
+						splashDot.style.left = `${splashRect.left}px`;
+						splashDot.style.top = `${splashRect.top}px`;
+						splashDot.style.width = `${splashRect.width}px`;
+						splashDot.style.height = `${splashRect.height}px`;
+						splashDot.style.margin = '0';
+						splashDot.style.transform = 'none'; // Resetear transformaciones previas
+						
+						// Forzar reflow
+						void splashDot.offsetHeight;
+
+						// Animar a la posición destino
+						splashDot.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+						splashDot.style.left = `${targetRect.left}px`;
+						splashDot.style.top = `${targetRect.top}px`;
+
+						// 2. Desvanecer la palabra hacia la izquierda
+						splashWord.style.opacity = '0';
+						splashWord.style.transform = 'translateX(-100px)';
+
+						// 3. Activar el título principal inmediatamente para sincronizar la posición
+						if (revealParent) {
+							revealParent.classList.add('active');
+							// Ocultar el punto destino temporalmente para evitar duplicados
+							targetDot.style.opacity = '0';
+						}
+					} else {
+						// Caso 404 o sin target: Simplemente desvanecer el splash
+						splash.style.opacity = '0';
 					}
 
 					splash.style.backgroundColor = 'transparent';
@@ -196,11 +294,13 @@ const { title } = Astro.props;
 					
 					// Iniciamos las animaciones de la página (Hero, etc.) justo cuando se va la cortina
 					setTimeout(() => {
-						splashText.style.opacity = '0'; // Desvanecer el texto suavemente
 						document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+						if (targetDot) targetDot.style.opacity = '1'; // Mostrar el punto real
 						setTimeout(() => {
 							splash.remove(); // Limpiamos el DOM
 							document.body.style.overflow = ''; // Reactivar scroll
+							// Forzar actualización de proyectos por si acaso
+							window.dispatchEvent(new Event('scroll'));
 						}, 1000);
 					}, 1000);
 				}, 2000);
@@ -244,18 +344,15 @@ const { title } = Astro.props;
 						const totalSlides = slides.length;
 						
 						if (totalSlides > 1) {
-							const step = 1 / (totalSlides - 1);
+							const totalSteps = totalSlides - 1;
+							// Determinamos el slide activo por umbral (redondeo) en lugar de interpolación
+							const activeIndex = Math.round(progress * totalSteps);
+
 							slides.forEach((slide, index) => {
-								if (index === 0) {
-									slide.style.opacity = '1'; // El primero siempre visible de base
-								} else {
-									// Calculamos opacidad basada en el progreso del scroll
-									const start = (index - 1) * step;
-									const end = index * step;
-									let opacity = (progress - start) / (end - start);
-									opacity = Math.max(0, Math.min(opacity, 1));
-									slide.style.opacity = opacity.toString();
-								}
+								const isActive = index === activeIndex;
+								// La transición CSS suavizará el cambio de 0 a 1 automáticamente
+								slide.style.opacity = isActive ? '1' : '0';
+								slide.style.pointerEvents = isActive ? 'auto' : 'none';
 							});
 						}
 					});
@@ -263,6 +360,7 @@ const { title } = Astro.props;
 
 				window.addEventListener('scroll', handleScroll, { passive: true });
 				window.addEventListener('resize', handleScroll);
+				window.addEventListener('load', handleScroll); // Asegurar cálculo tras carga completa
 				handleScroll(); // Inicializar inmediatamente para ajustar posición
 			}
 

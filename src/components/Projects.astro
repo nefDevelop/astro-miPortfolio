@@ -1,92 +1,52 @@
-<section class="relative bg-[#0a0a0a]">
-	<!-- Proyecto 1: NeonMarket -->
-	<div class="project-container h-[200vh]">
-		<div class="project-sticky">
-			<div class="project-slider">
-				
-				<!-- Slide 1: Intro -->
-				<div class="project-slide relative w-full h-full overflow-hidden bg-zinc-900 border-r border-white/5">
-					<img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop" class="absolute top-0 left-0 w-full h-[70%] md:h-full md:w-[75%] object-cover rounded-b-[3rem] md:rounded-b-none md:rounded-r-[3rem] [mask-image:linear-gradient(to_bottom,black_40%,transparent_100%)] md:[mask-image:linear-gradient(to_right,black_50%,transparent_100%)]" alt="NeonMarket Dashboard" />
-					<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
-						<div class="w-full md:w-1/2 md:ml-auto space-y-6">
-							<span class="text-cyan-400 font-mono tracking-widest">01 / E-COMMERCE</span>
-							<h2 class="text-5xl md:text-7xl font-bold text-white tracking-tighter">Neon<span class="text-cyan-400">Market</span></h2>
-							<p class="text-xl text-gray-400 leading-relaxed">Plataforma de comercio inmersivo. La primera pantalla muestra el dashboard principal con métricas en tiempo real.</p>
-						</div>
-					</div>
-				</div>
+---
+import { projects } from '../data/portfolio';
+---
 
-				<!-- Slide 2: Features -->
-				<div class="project-slide relative w-full h-full overflow-hidden bg-zinc-950 border-r border-white/5">
-					<img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop" class="absolute top-0 left-0 w-full h-[70%] md:h-full md:w-[75%] object-cover rounded-b-[3rem] md:rounded-b-none md:rounded-r-[3rem] [mask-image:linear-gradient(to_bottom,black_40%,transparent_100%)] md:[mask-image:linear-gradient(to_right,black_50%,transparent_100%)]" alt="Interface Detail" />
-					<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
-						<div class="w-full md:w-1/2 md:ml-auto space-y-8">
-							<h3 class="text-5xl font-bold text-white">Arquitectura</h3>
-							<p class="text-xl text-gray-400 leading-relaxed">Construido sobre una arquitectura de microservicios para escalar horizontalmente durante eventos de alto tráfico.</p>
-							<div class="flex flex-wrap gap-3">
-								<span class="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-cyan-300">React</span>
-								<span class="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-cyan-300">Node.js</span>
+<section class="relative">
+	{projects.map((project) => (
+		<article class="project-container h-[150vh]">
+			<div class="project-sticky">
+				<div class="project-slider">
+					
+					<!-- Slide 1: Intro -->
+					<div class="project-slide relative w-full h-full overflow-hidden border-r border-white/5 focus:!opacity-100 focus:z-20 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-inset" tabindex="0" aria-label={`Introducción del proyecto ${project.title}`}>
+						<img src={project.image} class="absolute top-0 left-0 md:top-1/2 md:-translate-y-1/2 md:left-10 w-full h-[60%] md:h-[60%] md:w-[80%] object-cover rounded-b-[3rem] md:rounded-[2rem] md:[mask-image:linear-gradient(to_right,black_50%,transparent_75%)]" alt={project.imageAlt || `Captura de pantalla del proyecto ${project.title}`} />
+						<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
+							<div class="w-full md:w-1/2 md:ml-auto space-y-6 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+								<span class={`${project.color} font-mono tracking-widest`}>{project.type}</span>
+								<h2 class="text-5xl md:text-7xl font-bold text-white tracking-tighter">{project.title}<span class={project.color}>{project.highlight}</span></h2>
+								<p class="text-xl text-gray-400 leading-relaxed">{project.desc}</p>
 							</div>
 						</div>
 					</div>
-				</div>
 
-				<!-- Slide 3: Mobile/Impact -->
-				<div class="project-slide relative w-full h-full overflow-hidden bg-zinc-900 border-r border-white/5">
-					<img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1470&auto=format&fit=crop" class="absolute top-0 left-0 w-full h-[70%] md:h-full md:w-[75%] object-cover rounded-b-[3rem] md:rounded-b-none md:rounded-r-[3rem] [mask-image:linear-gradient(to_bottom,black_40%,transparent_100%)] md:[mask-image:linear-gradient(to_right,black_50%,transparent_100%)]" alt="Mobile View" />
-					<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
-						<div class="w-full md:w-1/2 md:ml-auto space-y-6">
-							<h3 class="text-4xl font-bold text-white">Experiencia Móvil</h3>
-							<p class="text-xl text-gray-400">Optimización completa para dispositivos móviles, logrando un aumento del 145% en conversiones.</p>
+					<!-- Additional Slides -->
+					{project.slides.map((slide, index) => (
+						<div class="project-slide relative w-full h-full overflow-hidden border-r border-white/5 focus:!opacity-100 focus:z-20 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-inset" tabindex="0" aria-label={`Detalle: ${slide.title}`}>
+							<img src={slide.image} class="absolute top-0 left-0 md:top-1/2 md:-translate-y-1/2 md:left-10 w-full h-[60%] md:h-[60%] md:w-[80%] object-cover rounded-b-[3rem] md:rounded-[2rem] md:[mask-image:linear-gradient(to_right,black_50%,transparent_75%)]" alt={slide.imageAlt || slide.title} />
+							<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
+								<div class="w-full md:w-1/2 md:ml-auto space-y-6 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+									<h3 class="text-4xl font-bold text-white">{slide.title}</h3>
+									<p class="text-xl text-gray-400 leading-relaxed">{slide.desc}</p>
+									
+									{slide.tags && (
+										<div class="flex flex-wrap gap-3">
+											{slide.tags.map(tag => (
+												<span class="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-cyan-300">{tag}</span>
+											))}
+										</div>
+									)}
+
+									{slide.link && (
+										<a href={slide.link} class="inline-block px-8 py-3 bg-emerald-500 text-black font-bold rounded-full hover:bg-emerald-400 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-900">Ver Case Study</a>
+									)}
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
+					))}
 
+				</div>
 			</div>
-		</div>
-	</div>
-
-	<!-- Proyecto 2: NovaBank -->
-	<div class="project-container h-[200vh]">
-		<div class="project-sticky">
-			<div class="project-slider">
-				
-				<!-- Slide 1: Intro -->
-				<div class="project-slide relative w-full h-full overflow-hidden bg-slate-900 border-r border-white/5">
-					<img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470&auto=format&fit=crop" class="absolute top-0 left-0 w-full h-[70%] md:h-full md:w-[75%] object-cover rounded-b-[3rem] md:rounded-b-none md:rounded-r-[3rem] [mask-image:linear-gradient(to_bottom,black_40%,transparent_100%)] md:[mask-image:linear-gradient(to_right,black_50%,transparent_100%)]" alt="NovaBank Dashboard" />
-					<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
-						<div class="w-full md:w-1/2 md:ml-auto space-y-6">
-							<span class="text-emerald-400 font-mono tracking-widest">02 / FINTECH</span>
-							<h2 class="text-5xl md:text-7xl font-bold text-white tracking-tighter">Nova<span class="text-emerald-400">Bank</span></h2>
-							<p class="text-xl text-gray-400 leading-relaxed">Banca digital redefinida. Visualización clara de activos y movimientos en tiempo real.</p>
-						</div>
-					</div>
-				</div>
-
-				<!-- Slide 2: Features -->
-				<div class="project-slide relative w-full h-full overflow-hidden bg-slate-950 border-r border-white/5">
-					<img src="https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1470&auto=format&fit=crop" class="absolute top-0 left-0 w-full h-[70%] md:h-full md:w-[75%] object-cover rounded-b-[3rem] md:rounded-b-none md:rounded-r-[3rem] [mask-image:linear-gradient(to_bottom,black_40%,transparent_100%)] md:[mask-image:linear-gradient(to_right,black_50%,transparent_100%)]" alt="Payments Feature" />
-					<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
-						<div class="w-full md:w-1/2 md:ml-auto space-y-6">
-							<h3 class="text-4xl font-bold text-white">Pagos Instantáneos</h3>
-							<p class="text-xl text-gray-400">Sistema de pagos P2P con confirmación biométrica y cero latencia.</p>
-						</div>
-					</div>
-				</div>
-
-				<!-- Slide 3: Security/App -->
-				<div class="project-slide relative w-full h-full overflow-hidden bg-slate-900 border-r border-white/5">
-					<img src="https://images.unsplash.com/photo-1616077168079-7e09a677fb2c?q=80&w=1470&auto=format&fit=crop" class="absolute top-0 left-0 w-full h-[70%] md:h-full md:w-[75%] object-cover rounded-b-[3rem] md:rounded-b-none md:rounded-r-[3rem] [mask-image:linear-gradient(to_bottom,black_40%,transparent_100%)] md:[mask-image:linear-gradient(to_right,black_50%,transparent_100%)]" alt="Security Shield" />
-					<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
-						<div class="w-full md:w-1/2 md:ml-auto space-y-6">
-							<h3 class="text-4xl font-bold text-white">Seguridad Total</h3>
-							<p class="text-xl text-gray-400">Encriptación de extremo a extremo y detección de fraude mediante IA.</p>
-							<button class="px-8 py-3 bg-emerald-500 text-black font-bold rounded-full hover:bg-emerald-400 transition-colors">Ver Case Study</button>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
+		</article>
+	))}
 </section>
