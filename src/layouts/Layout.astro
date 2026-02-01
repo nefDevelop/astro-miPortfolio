@@ -42,7 +42,7 @@ const { title, showSplash = true } = Astro.props;
 		<!-- Intro / Splash Screen -->
 		{showSplash && (
 			<div id="splash" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a0a0a] transition-all duration-1000">
-				<h1 id="splash-text" class="text-5xl md:text-8xl font-extrabold text-white tracking-tight opacity-0 translate-y-10 transition-all duration-1000 ease-out mt-[198px]">Hola.</h1>
+				<h1 id="splash-text" class="text-5xl md:text-8xl font-extrabold text-white tracking-tight opacity-0 translate-y-10 transition-all duration-1000 ease-out mt-[254px]">Hola.</h1>
 			</div>
 		)}
 
@@ -198,37 +198,6 @@ const { title, showSplash = true } = Astro.props;
 
 				// Bloquear scroll durante la intro
 				document.body.style.overflow = 'hidden';
-
-				// Alineación vertical precisa
-				if (targetDot && splashDot) {
-					// 1. Medir posición destino
-					let targetTop = 0;
-					const revealParent = targetDot.closest('.reveal') as HTMLElement | null;
-					if (revealParent) {
-						const prevTransform = revealParent.style.transform;
-						revealParent.style.transform = 'none';
-						targetTop = targetDot.getBoundingClientRect().top;
-						revealParent.style.transform = prevTransform;
-					} else {
-						targetTop = targetDot.getBoundingClientRect().top;
-					}
-
-					// 2. Posicionar splashText
-					splashText.style.marginTop = '0';
-					splashText.style.position = 'absolute';
-					splashText.style.width = '100%';
-					splashText.style.textAlign = 'center';
-					
-					// Calcular offset interno del punto
-					splashText.classList.remove('translate-y-10');
-					const dotTop = splashDot.getBoundingClientRect().top;
-					const textTop = splashText.getBoundingClientRect().top;
-					const internalOffset = dotTop - textTop;
-					
-					// Aplicar posición final
-					splashText.style.top = `${targetTop - internalOffset}px`;
-					splashText.classList.add('translate-y-10');
-				}
 
 				// 1. Entrada del texto "Hola"
 				setTimeout(() => {
