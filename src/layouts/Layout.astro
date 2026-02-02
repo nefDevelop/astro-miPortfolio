@@ -52,7 +52,7 @@ const { title, showSplash = true } = Astro.props;
 		<!-- Intro / Splash Screen -->
 		{showSplash && (
 			<div id="splash" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a0a0a] transition-all duration-1000">
-				<h1 id="splash-text" class="text-5xl md:text-8xl font-extrabold text-white tracking-tight opacity-0 translate-y-10 transition-all duration-700 ease-out">Hola.</h1>
+				<div id="splash-text" class="text-5xl md:text-8xl font-extrabold text-white tracking-tight opacity-0 translate-y-10 transition-all duration-700 ease-out">Hola.</div>
 			</div>
 		)}
 
@@ -171,12 +171,12 @@ const { title, showSplash = true } = Astro.props;
 				0% { transform: scale(1); color: white; }
 				10% { transform: scale(2) translate(-6px); color: #22d3ee; }
 				20% { transform: scale(2) translate(6px); color: #22d3ee; }
-				30% { transform: scale(2) translate(-6px); color: #a855f7; }
-				40% { transform: scale(2) translate(6px); color: #a855f7; }
+				30% { transform: scale(2) translate(-6px); color: #c084fc; }
+				40% { transform: scale(2) translate(6px); color: #c084fc; }
 				50% { transform: scale(2) translate(-6px); color: #22d3ee; }
 				60% { transform: scale(2) translate(6px); color: #22d3ee; }
-				70% { transform: scale(2) translate(0); color: #a855f7; }
-				100% { transform: scale(1); color: #9333ea; }
+				70% { transform: scale(2) translate(0); color: #c084fc; }
+				100% { transform: scale(1); color: #c084fc; }
 			}
 			.dot-anim {
 				animation: shake-fill 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -357,7 +357,7 @@ const { title, showSplash = true } = Astro.props;
 						
 						// 1. Animar salida del texto hacia la izquierda
 						splashDot.classList.remove('dot-anim');
-						splashDot.style.color = '#9333ea'; // Mantener color final (morado)
+						splashDot.style.color = '#c084fc'; // Mantener color final (morado claro)
 						
 						// El reflow forzado aquí es innecesario con Web Animations API
 
