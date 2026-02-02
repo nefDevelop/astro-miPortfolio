@@ -42,7 +42,7 @@ const { title, showSplash = true } = Astro.props;
 		<!-- Intro / Splash Screen -->
 		{showSplash && (
 			<div id="splash" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a0a0a] transition-all duration-1000">
-				<h1 id="splash-text" class="text-5xl md:text-8xl font-extrabold text-white tracking-tight opacity-0 translate-y-10 transition-all duration-1000 ease-out mt-[254px]">Hola.</h1>
+				<h1 id="splash-text" class="text-5xl md:text-8xl font-extrabold text-white tracking-tight opacity-0 translate-y-10 transition-all duration-1000 ease-out mt-[158px]">Hola.</h1>
 			</div>
 		)}
 
@@ -218,40 +218,17 @@ const { title, showSplash = true } = Astro.props;
 					const splashWord = document.getElementById('splash-word');
 
 					if (targetDot && splashDot && splashWord && splash) {
-						const splashRect = splashDot.getBoundingClientRect();
-						const targetRect = targetDot.getBoundingClientRect();
 						const revealParent = targetDot.closest('.reveal');
 						
-						// 1. Mover el punto a su destino final
-						splashDot.classList.remove('dot-anim'); // Detener animación previa
-						splashDot.style.color = '#9333ea'; // Asegurar color final (purple-600)
-						
-						// Usar posición fixed para la transición para evitar problemas de contexto
-						splashDot.style.position = 'fixed';
-						splashDot.style.left = `${splashRect.left}px`;
-						splashDot.style.top = `${splashRect.top}px`;
-						splashDot.style.width = `${splashRect.width}px`;
-						splashDot.style.height = `${splashRect.height}px`;
-						splashDot.style.margin = '0';
-						splashDot.style.transform = 'none'; // Resetear transformaciones previas
-						
-						// Forzar reflow
-						void splashDot.offsetHeight;
+						// 1. Animar salida del texto hacia la izquierda
+						splashDot.classList.remove('dot-anim');
+						splashText.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+						splashText.style.transform = 'translateX(-100px)';
+						splashText.style.opacity = '0';
 
-						// Animar a la posición destino
-						splashDot.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
-						splashDot.style.left = `${targetRect.left}px`;
-						splashDot.style.top = `${targetRect.top}px`;
-
-						// 2. Desvanecer la palabra hacia la izquierda
-						splashWord.style.opacity = '0';
-						splashWord.style.transform = 'translateX(-100px)';
-
-						// 3. Activar el título principal inmediatamente para sincronizar la posición
+						// 2. Activar el título principal
 						if (revealParent) {
 							revealParent.classList.add('active');
-							// Ocultar el punto destino temporalmente para evitar duplicados
-							targetDot.style.opacity = '0';
 						}
 					} else {
 						// Caso 404 o sin target: Simplemente desvanecer el splash
@@ -288,43 +265,60 @@ const { title, showSplash = true } = Astro.props;
 
 			// Lógica para Proyectos: Scroll Horizontal (Pin)
 			function initProjects() {
-				const projectContainers = document.querySelectorAll<HTMLElement>('.project-container');
+				const projectContainers = document.querySelectorAll('.project-container');
+				let ticking = false;
 				
 				const handleScroll = () => {
-					projectContainers.forEach((container) => {
-						const slider = container.querySelector<HTMLElement>('.project-slider');
-						if (!slider) return;
+					if (!ticking) {
+						window.requestAnimationFrame(() => {
+							const viewportHeight = window.innerHeight;
+							
+							// Fase 1: Lectura (Reads) - Agrupamos las mediciones para evitar reflows
+							const updates: { slider: Element; progress: number }[] = [];
+							projectContainers.forEach((container) => {
+								const slider = container.querySelector('.project-slider');
+								if (!slider) return;
 
-						const rect = container.getBoundingClientRect();
-						const viewportHeight = window.innerHeight;
-						const totalScrollDistance = rect.height - viewportHeight;
+								const rect = container.getBoundingClientRect();
+								const totalScrollDistance = rect.height - viewportHeight;
 
-						if (totalScrollDistance <= 0) return;
+								if (totalScrollDistance <= 0) return;
 
-						// Calculamos el progreso: 0 al inicio del sticky, 1 al final
-						let progress = 0;
-						if (rect.top <= 0) {
-							progress = Math.abs(rect.top) / totalScrollDistance;
-						}
-						progress = Math.max(0, Math.min(progress, 1));
-
-						// Lógica de Opacidad (Stacking)
-						const slides = slider.querySelectorAll<HTMLElement>('.project-slide');
-						const totalSlides = slides.length;
-						
-						if (totalSlides > 1) {
-							const totalSteps = totalSlides - 1;
-							// Determinamos el slide activo por umbral (redondeo) en lugar de interpolación
-							const activeIndex = Math.round(progress * totalSteps);
-
-							slides.forEach((slide, index) => {
-								const isActive = index === activeIndex;
-								// La transición CSS suavizará el cambio de 0 a 1 automáticamente
-								slide.style.opacity = isActive ? '1' : '0';
-								slide.style.pointerEvents = isActive ? 'auto' : 'none';
+								let progress = 0;
+								if (rect.top <= 0) {
+									progress = Math.abs(rect.top) / totalScrollDistance;
+								}
+								progress = Math.max(0, Math.min(progress, 1));
+								updates.push({ slider, progress });
 							});
-						}
-					});
+
+							// Fase 2: Escritura (Writes) - Aplicamos estilos en lote
+							updates.forEach(({ slider, progress }) => {
+								const slides = slider.querySelectorAll<HTMLElement>('.project-slide');
+								const totalSlides = slides.length;
+								
+								if (totalSlides > 1) {
+									const totalSteps = totalSlides - 1;
+									const activeIndex = Math.round(progress * totalSteps);
+
+									slides.forEach((slide, index) => {
+										const isActive = index === activeIndex;
+										const newOpacity = isActive ? '1' : '0';
+										const newPointerEvents = isActive ? 'auto' : 'none';
+										
+										// Solo escribir si el valor cambia
+										if (slide.style.opacity !== newOpacity) {
+											slide.style.opacity = newOpacity;
+											slide.style.pointerEvents = newPointerEvents;
+										}
+									});
+								}
+							});
+							
+							ticking = false;
+						});
+						ticking = true;
+					}
 				};
 
 				window.addEventListener('scroll', handleScroll, { passive: true });
