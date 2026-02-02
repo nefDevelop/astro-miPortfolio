@@ -20,6 +20,15 @@ const { title, showSplash = true } = Astro.props;
 		<link rel="preconnect" href="https://images.unsplash.com">
 		<link rel="preload" href={onestFont} as="font" type="font/ttf" crossorigin />
 		<title>{title}</title>
+		<style is:inline set:html={`
+			@font-face {
+				font-family: 'Onest';
+				src: url('${onestFont}') format('truetype');
+				font-weight: 100 900;
+				font-style: normal;
+				font-display: swap;
+			}
+		`}></style>
 		<script is:inline>
 			// Script crítico: Se ejecuta inmediatamente para bloquear el scroll automático
 			if (history.scrollRestoration) {
@@ -50,14 +59,6 @@ const { title, showSplash = true } = Astro.props;
 		<slot />
 
 		<style is:global>
-			@font-face {
-				font-family: 'Onest';
-				src: url('../data/Onest.ttf') format('truetype');
-				font-weight: 100 900;
-				font-style: normal;
-				font-display: swap;
-			}
-
 			/* Accesibilidad: Focus Visible Global */
 			:focus-visible {
 				outline: 2px solid #22d3ee; /* cyan-400 */
@@ -313,8 +314,9 @@ const { title, showSplash = true } = Astro.props;
 					// Ajuste: Alineamos centros y bajamos 20px extra para corregir la percepción de "muy alto"
 					splashText.style.marginTop = `${targetCenterY - splashCenterY + 36}px`;
 					
-					void splashText.offsetHeight; // Forzar reflow
-					splashText.style.transition = '';
+					requestAnimationFrame(() => {
+						splashText.style.transition = '';
+					});
 				}
 
 				// Bloquear scroll durante la intro
@@ -357,8 +359,7 @@ const { title, showSplash = true } = Astro.props;
 						splashDot.classList.remove('dot-anim');
 						splashDot.style.color = '#9333ea'; // Mantener color final (morado)
 						
-						// Forzar reflow para que el navegador registre el estado inicial antes de mover
-						void splashDot.offsetWidth;
+						// El reflow forzado aquí es innecesario con Web Animations API
 
 						// El punto viaja solo hacia su destino (cálculo exacto)
 						// Usamos Web Animations API para un rebote complejo (choca, rebota, asienta)
