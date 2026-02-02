@@ -171,12 +171,12 @@ const { title, showSplash = true } = Astro.props;
 				0% { transform: scale(1); color: white; }
 				10% { transform: scale(2) translate(-6px); color: #22d3ee; }
 				20% { transform: scale(2) translate(6px); color: #22d3ee; }
-				30% { transform: scale(2) translate(-6px); color: #c084fc; }
-				40% { transform: scale(2) translate(6px); color: #c084fc; }
+				30% { transform: scale(2) translate(-6px); color: #d8b4fe; }
+				40% { transform: scale(2) translate(6px); color: #d8b4fe; }
 				50% { transform: scale(2) translate(-6px); color: #22d3ee; }
 				60% { transform: scale(2) translate(6px); color: #22d3ee; }
-				70% { transform: scale(2) translate(0); color: #c084fc; }
-				100% { transform: scale(1); color: #c084fc; }
+				70% { transform: scale(2) translate(0); color: #d8b4fe; }
+				100% { transform: scale(1); color: #d8b4fe; }
 			}
 			.dot-anim {
 				animation: shake-fill 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -357,7 +357,7 @@ const { title, showSplash = true } = Astro.props;
 						
 						// 1. Animar salida del texto hacia la izquierda
 						splashDot.classList.remove('dot-anim');
-						splashDot.style.color = '#c084fc'; // Mantener color final (morado claro)
+						splashDot.style.color = '#d8b4fe'; // Mantener color final (morado aún más claro)
 						
 						// El reflow forzado aquí es innecesario con Web Animations API
 

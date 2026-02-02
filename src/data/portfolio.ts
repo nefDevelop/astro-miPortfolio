@@ -68,7 +68,7 @@ export const projects: Project[] = [
     desc: "Plataforma de comercio inmersivo. La primera pantalla muestra el dashboard principal con métricas en tiempo real.",
     image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1200&auto=format&fit=crop",
     imageAlt: "Interfaz del dashboard de Neon mostrando gráficos de ventas y actividad de usuarios en tonos neón",
-    color: "text-cyan-300",
+    color: "text-cyan-200",
     slides: [
       {
         title: "Arquitectura",
@@ -92,7 +92,7 @@ export const projects: Project[] = [
     desc: "Banca digital redefinida. Visualización clara de activos y movimientos en tiempo real.",
     image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop",
     imageAlt: "Pantalla principal de la app Nova mostrando el saldo total y gráfico de gastos mensuales",
-    color: "text-emerald-300",
+    color: "text-emerald-200",
     slides: [
       {
         title: "Pagos Instantáneos",
