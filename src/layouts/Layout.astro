@@ -15,9 +15,7 @@ const { title, showSplash = true } = Astro.props;
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap" rel="stylesheet">
+		<link rel="preconnect" href="https://images.unsplash.com">
 		<title>{title}</title>
 		<script is:inline>
 			// Script crítico: Se ejecuta inmediatamente para bloquear el scroll automático
@@ -42,13 +40,21 @@ const { title, showSplash = true } = Astro.props;
 		<!-- Intro / Splash Screen -->
 		{showSplash && (
 			<div id="splash" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a0a0a] transition-all duration-1000">
-				<h1 id="splash-text" class="text-5xl md:text-8xl font-extrabold text-white tracking-tight opacity-0 translate-y-10 transition-all duration-1000 ease-out mt-[158px]">Hola.</h1>
+				<h1 id="splash-text" class="text-5xl md:text-8xl font-extrabold text-white tracking-tight opacity-0 translate-y-10 transition-all duration-700 ease-out">Hola.</h1>
 			</div>
 		)}
 
 		<slot />
 
 		<style is:global>
+			@font-face {
+				font-family: 'Onest';
+				src: url('../data/Onest.ttf') format('truetype');
+				font-weight: 100 900;
+				font-style: normal;
+				font-display: swap;
+			}
+
 			/* Accesibilidad: Focus Visible Global */
 			:focus-visible {
 				outline: 2px solid #22d3ee; /* cyan-400 */
@@ -81,11 +87,20 @@ const { title, showSplash = true } = Astro.props;
 			.project-container {
 				position: relative;
 				width: 100%;
+				overflow-anchor: none; /* Evita advertencias de anclaje de scroll al manipular el layout */
+				min-height: 250vh; /* Altura mínima para dar recorrido al scroll en escritorio */
+			}
+			@media (max-width: 768px) {
+				.project-container { 
+					margin-top: 3rem;
+					min-height: 400vh; /* Mucha más altura en móvil para contrarrestar el scroll rápido (inercia) */
+				}
 			}
 			.project-sticky {
 				position: sticky;
 				top: 0;
 				height: 100vh;
+				height: 100dvh; /* Usar altura dinámica del viewport para móviles (evita saltos por la barra de URL) */
 				width: 100%;
 				overflow: hidden;
 			}
@@ -100,8 +115,16 @@ const { title, showSplash = true } = Astro.props;
 				width: 100%;
 				height: 100%;
 				opacity: 0;
-				will-change: opacity;
 				transition: opacity 0.6s ease-in-out;
+			}
+
+			@media (max-width: 768px) {
+				/* Ajusta el radio de las tarjetas de proyecto para que solo las esquinas superiores sean redondeadas en móvil. */
+				.project-slide > div > div {
+					border-radius: 0 0 1rem 1rem !important;
+					justify-content: flex-start !important;
+					gap: 2rem !important;
+				}
 			}
 
 			/* Animaciones de fondo */
@@ -142,17 +165,83 @@ const { title, showSplash = true } = Astro.props;
 
 			@keyframes shake-fill {
 				0% { transform: scale(1); color: white; }
-				10% { transform: scale(1.5) translate(-2px); color: #22d3ee; }
-				20% { transform: scale(1.5) translate(2px); color: #22d3ee; }
-				30% { transform: scale(1.5) translate(-2px); color: #a855f7; }
-				40% { transform: scale(1.5) translate(2px); color: #a855f7; }
-				50% { transform: scale(1.5) translate(-2px); color: #22d3ee; }
-				60% { transform: scale(1.5) translate(2px); color: #22d3ee; }
-				70% { transform: scale(1.5) translate(0); color: #a855f7; }
+				10% { transform: scale(2) translate(-6px); color: #22d3ee; }
+				20% { transform: scale(2) translate(6px); color: #22d3ee; }
+				30% { transform: scale(2) translate(-6px); color: #a855f7; }
+				40% { transform: scale(2) translate(6px); color: #a855f7; }
+				50% { transform: scale(2) translate(-6px); color: #22d3ee; }
+				60% { transform: scale(2) translate(6px); color: #22d3ee; }
+				70% { transform: scale(2) translate(0); color: #a855f7; }
 				100% { transform: scale(1); color: #9333ea; }
 			}
 			.dot-anim {
 				animation: shake-fill 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+			}
+
+			@property --fill-angle {
+				syntax: '<angle>';
+				initial-value: 0deg;
+				inherits: true;
+			}
+			@property --start-angle {
+				syntax: '<angle>';
+				initial-value: 0deg;
+				inherits: true;
+			}
+
+			/* Animación Badges Tech Stack */
+			.tech-badge, .photo-glow {
+				position: relative;
+				z-index: 0;
+				overflow: hidden;
+				transition: background-color 0.5s ease-out;
+			}
+			.tech-badge {
+				border-radius: 9999px;
+			}
+			.photo-glow {
+				padding: 2px; /* Grosor del borde */
+				border-radius: 1rem; /* Radio por defecto */
+			}
+			.photo-glow > img {
+				border-radius: inherit;
+				display: block;
+			}
+			.tech-badge::before, .photo-glow::before {
+				content: '';
+				position: absolute;
+				z-index: -2;
+				left: -50%;
+				top: -50%;
+				width: 200%;
+				height: 200%;
+				background-repeat: no-repeat;
+				background-position: 0 0;
+				background-image: conic-gradient(from var(--start-angle), rgba(120, 119, 198, 1) var(--fill-angle), transparent var(--fill-angle));
+				opacity: 0;
+				transition: opacity 0.5s ease-out;
+			}
+			.tech-badge::after, .photo-glow::after {
+				content: '';
+				position: absolute;
+				z-index: -1;
+				inset: 2px;
+				background: #171717;
+				border-radius: inherit;
+				opacity: 0;
+				transition: opacity 0.5s ease-out;
+			}
+			.tech-badge:hover, .photo-glow:hover {
+				animation: none !important;
+				background-color: transparent !important;
+			}
+			.tech-badge:hover::before, .photo-glow:hover::before {
+				opacity: 1;
+				transition: opacity 0.1s ease-in;
+			}
+			.tech-badge:hover::after, .photo-glow:hover::after {
+				opacity: 1;
+				transition: opacity 0.1s ease-in;
 			}
 		</style>
 
@@ -183,18 +272,47 @@ const { title, showSplash = true } = Astro.props;
 				const greetings: Record<string, string> = {
 					es: 'Hola.',
 					en: 'Hello.',
-					fr: 'Bonjour.',
-					de: 'Hallo.',
-					it: 'Ciao.',
-					pt: 'Olá.'
 				};
 				const text = greetings[lang] || '\nHello.';
-				splashText.innerHTML = `<span id="splash-word" class="inline-block transition-all duration-1000 ease-out">${text.slice(0, -1)}</span><span id="splash-dot" class="inline-block transition-all duration-1000 ease-out">${text.slice(-1)}</span>`;
+				splashText.innerHTML = `<span id="splash-word" class="inline-block transition-all duration-1000 ease-out">${text.slice(0, -1)}</span><span class="inline-block w-0 overflow-visible"><span id="splash-dot" class="inline-block transition-all duration-1000 ease-out" style="font-family: Arial;">${text.slice(-1)}</span></span>`;
+
+				// Actualizar texto "Soy" -> "I'm" según idioma detectado
+				const profilePronoun = document.getElementById('profile-pronoun');
+				if (profilePronoun) {
+					const pronouns: Record<string, string> = {
+						es: 'Soy',
+						en: "I'm",
+					};
+					profilePronoun.textContent = pronouns[lang] || "I'm";
+				}
 
 				const splashDot = document.getElementById('splash-dot');
 
 				// Esperar a que las fuentes carguen para cálculos precisos
 				await document.fonts.ready;
+
+				// Calcular posición vertical inicial para alinear con el target (movimiento horizontal puro)
+				if (targetDot && splashDot) {
+					targetDot.style.opacity = '0'; // Ocultar punto destino inicialmente
+					// Desactivar transiciones temporalmente para medir y ajustar sin animación
+					splashText.style.transition = 'none';
+					splashText.classList.remove('translate-y-10');
+					splashText.style.marginTop = ''; // Limpiar margen previo para medición correcta
+					
+					const splashRect = splashDot.getBoundingClientRect();
+					const targetRect = targetDot.getBoundingClientRect();
+					
+					splashText.classList.add('translate-y-10');
+					
+					const splashCenterY = splashRect.top + splashRect.height / 2;
+					const targetCenterY = targetRect.top + targetRect.height / 2;
+					
+					// Ajuste: Alineamos centros y bajamos 20px extra para corregir la percepción de "muy alto"
+					splashText.style.marginTop = `${targetCenterY - splashCenterY + 36}px`;
+					
+					void splashText.offsetHeight; // Forzar reflow
+					splashText.style.transition = '';
+				}
 
 				// Bloquear scroll durante la intro
 				document.body.style.overflow = 'hidden';
@@ -209,8 +327,14 @@ const { title, showSplash = true } = Astro.props;
 				// 1.5. Animación del punto (Shake & Fill)
 				setTimeout(() => {
 					const dot = document.getElementById('splash-dot');
-					if (dot) dot.classList.add('dot-anim');
-				}, 1000);
+					if (dot) {
+						dot.classList.add('dot-anim');
+						// Restaurar fuente Onest casi al final de la animación
+						setTimeout(() => {
+							dot.style.fontFamily = '';
+						}, 400);
+					}
+				}, 900);
 
 				// 2. Salida del Splash y activación de animaciones del contenido
 				setTimeout(() => {
@@ -218,13 +342,51 @@ const { title, showSplash = true } = Astro.props;
 					const splashWord = document.getElementById('splash-word');
 
 					if (targetDot && splashDot && splashWord && splash) {
+						// Calcular posiciones dinámicamente para alinear el punto matemáticamente
+						const splashRect = splashDot.getBoundingClientRect();
+						const targetRect = targetDot.getBoundingClientRect();
+						const moveX = (targetRect.left + targetRect.width / 2) - (splashRect.left + splashRect.width / 2);
+						const moveY = (targetRect.top + targetRect.height / 2) - (splashRect.top + splashRect.height / 2);
+
 						const revealParent = targetDot.closest('.reveal');
 						
 						// 1. Animar salida del texto hacia la izquierda
 						splashDot.classList.remove('dot-anim');
-						splashText.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
-						splashText.style.transform = 'translateX(-100px)';
-						splashText.style.opacity = '0';
+						splashDot.style.color = '#9333ea'; // Mantener color final (morado)
+						
+						// Forzar reflow para que el navegador registre el estado inicial antes de mover
+						void splashDot.offsetWidth;
+
+						// El punto viaja solo hacia su destino (cálculo exacto)
+						// Usamos Web Animations API para un rebote complejo (choca, rebota, asienta)
+						splashDot.animate([
+							// 80% del tiempo es para llegar al destino, acelerando al final para el "choque"
+							// FASE 1 (0-5% del tiempo): Aceleración. Recorre el 5% de la distancia.
+							{ transform: `translate(${moveX * 0.05}px, ${moveY * 0.05}px)`, easing: 'ease-in', offset: 0.04 },
+							// FASE 2 (5-90% del tiempo): Velocidad máxima. Recorre hasta el 95% de la distancia.
+							{ transform: `translate(${moveX * 0.95}px, ${moveY * 0.95}px)`, easing: 'linear', offset: 0.72 },
+							// FASE 3 (90-100% del tiempo): Intento de frenada. Recorre el 5% final.
+							{ transform: `translate(${moveX}px, ${moveY}px)`, easing: 'ease-out', offset: 0.8 },
+							// 1er Rebote: Vuelve atrás un 5% de la distancia total
+							{ transform: `translate(${moveX * 0.95}px, ${moveY * 0.95}px)`, easing: 'ease-out', offset: 0.9 },
+							// 2do Rebote: Se pasa un 1% hacia adelante
+							{ transform: `translate(${moveX * 1.01}px, ${moveY * 1.01}px)`, easing: 'ease-in', offset: 0.95 },
+							// Asentamiento final en la posición exacta
+							{ transform: `translate(${moveX}px, ${moveY}px)`, easing: 'ease-out', offset: 1 }
+						], {
+							duration: 1000,
+							fill: 'forwards' // Mantiene el estado final de la animación
+						});
+
+						// La opacidad se anima por separado para desaparecer justo al final
+						splashDot.animate([{ opacity: 1, offset: 0.99 }, { opacity: 0, offset: 1 }], {
+							duration: 1000,
+							fill: 'forwards'
+						});
+						// El texto se queda en el sitio y se va hacia el fondo
+						splashWord.style.transition = 'opacity 0.5s ease-out, transform 1s ease-in';
+						splashWord.style.transform = 'scale(0.5)';
+						splashWord.style.opacity = '0';
 
 						// 2. Activar el título principal
 						if (revealParent) {
@@ -241,7 +403,10 @@ const { title, showSplash = true } = Astro.props;
 					// Iniciamos las animaciones de la página (Hero, etc.) justo cuando se va la cortina
 					setTimeout(() => {
 						document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-						if (targetDot) targetDot.style.opacity = '1'; // Mostrar el punto real
+						if (targetDot) {
+							targetDot.style.transition = 'none'; // Asegurar cambio instantáneo
+							targetDot.style.opacity = '1'; // Mostrar el punto real debajo del splash
+						}
 						setTimeout(() => {
 							splash.remove(); // Limpiamos el DOM
 							document.body.style.overflow = ''; // Reactivar scroll
@@ -254,19 +419,49 @@ const { title, showSplash = true } = Astro.props;
 
 			// Efecto Parallax Scroll: Mueve elementos verticalmente al hacer scroll
 			const parallaxScrolls = document.querySelectorAll<HTMLElement>('.parallax-scroll');
+			let parallaxTicking = false;
 			window.addEventListener('scroll', () => {
-				const scrolled = window.pageYOffset;
-				parallaxScrolls.forEach((el) => {
-					const speed = parseFloat(el.getAttribute('data-scroll-speed') || '0');
-					// Movemos el elemento suavemente basado en el scroll
-					el.style.transform = `translateY(${scrolled * speed}px)`;
-				});
-			});
+				if (!parallaxTicking) {
+					window.requestAnimationFrame(() => {
+						const scrolled = window.pageYOffset;
+						parallaxScrolls.forEach((el) => {
+							const speed = parseFloat(el.getAttribute('data-scroll-speed') || '0');
+							el.style.transform = `translateY(${scrolled * speed}px)`;
+						});
+						parallaxTicking = false;
+					});
+					parallaxTicking = true;
+				}
+			}, { passive: true });
 
 			// Lógica para Proyectos: Scroll Horizontal (Pin)
 			function initProjects() {
 				const projectContainers = document.querySelectorAll('.project-container');
 				let ticking = false;
+
+				// Configurar navegación por teclado (Tab) para los slides
+				projectContainers.forEach((container) => {
+					const slider = container.querySelector('.project-slider');
+					if (!slider) return;
+					const slides = slider.querySelectorAll('.project-slide');
+					const totalSlides = slides.length;
+
+					slides.forEach((slide, index) => {
+						slide.setAttribute('tabindex', '0');
+						slide.addEventListener('focus', () => {
+							const rect = container.getBoundingClientRect();
+							const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+							const absoluteContainerTop = rect.top + scrollTop;
+							const totalScrollDistance = (container as HTMLElement).offsetHeight - window.innerHeight;
+
+							if (totalSlides > 1 && totalScrollDistance > 0) {
+								const progress = index / (totalSlides - 1);
+								const targetScroll = absoluteContainerTop + (progress * totalScrollDistance);
+								window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+							}
+						});
+					});
+				});
 				
 				const handleScroll = () => {
 					if (!ticking) {
@@ -327,11 +522,36 @@ const { title, showSplash = true } = Astro.props;
 				handleScroll(); // Inicializar inmediatamente para ajustar posición
 			}
 
+			// Inicializar Badges Tech Stack (Cálculo de ángulo de entrada)
+			function initTechBadges() {
+				const badges = document.querySelectorAll('.tech-badge, .photo-glow');
+				badges.forEach((badge) => {
+					let animation: Animation | undefined;
+					badge.addEventListener('mouseenter', (e) => {
+						const rect = badge.getBoundingClientRect();
+						const x = (e as MouseEvent).clientX - (rect.left + rect.width / 2);
+						const y = (e as MouseEvent).clientY - (rect.top + rect.height / 2);
+						// Calcular ángulo y ajustar para que 0deg sea arriba (CSS conic-gradient standard)
+						const deg = Math.atan2(y, x) * (180 / Math.PI) + 90;
+						(badge as HTMLElement).style.setProperty('--start-angle', `${deg}deg`);
+
+						// Reiniciar animación de llenado desde 0
+						if (animation) animation.cancel();
+						animation = (badge as HTMLElement).animate(
+							{ '--fill-angle': ['0deg', '360deg'] },
+							{ duration: 1000, easing: 'ease-out', fill: 'forwards' }
+						);
+					});
+				});
+			}
+
 			// Inicializar cuando el DOM esté listo
 			if (document.readyState === 'loading') {
 				document.addEventListener('DOMContentLoaded', initProjects);
+				document.addEventListener('DOMContentLoaded', initTechBadges);
 			} else {
 				initProjects();
+				initTechBadges();
 			}
 		</script>
 	</body>

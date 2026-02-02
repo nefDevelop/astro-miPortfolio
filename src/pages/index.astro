@@ -19,7 +19,7 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 				Disponible para nuevos proyectos
 			</div>
 			<h1 class="reveal text-5xl md:text-8xl font-extrabold tracking-tight delay-100 leading-tight">
-				Soy <br/>
+				<span id="profile-pronoun">Soy</span> <br/>
 				<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">{personalInfo.name}</span><span id="target-dot" class="text-purple-600">.</span>
 			</h1>
 			<p class="reveal text-xl text-slate-400 max-w-2xl leading-relaxed delay-200 font-light">
@@ -46,8 +46,8 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 				<!-- Imagen con efecto Parallax Scroll (se mueve más lento que el resto) -->
 				<div class="reveal reveal-left relative group">
-					<div class="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
-					<div class="relative rounded-2xl overflow-hidden aspect-square">
+					<div class="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+					<div class="photo-glow relative rounded-2xl overflow-hidden aspect-square">
 						<img 
 							src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80" 
 							alt={`Foto de perfil de ${personalInfo.name}`}
@@ -61,10 +61,10 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 						<span class="w-12 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"></span>
 						Sobre mí
 					</h2>
-					<p class="text-slate-300 text-lg leading-relaxed">
+					<p class="text-slate-300 text-lg leading-relaxed focus:outline-none focus:text-white transition-colors" tabindex="0">
 						{about.description_1}
 					</p>
-					<p class="text-slate-300 text-lg leading-relaxed">
+					<p class="text-slate-300 text-lg leading-relaxed focus:outline-none focus:text-white transition-colors" tabindex="0">
 						{about.description_2}
 					</p>
 					
@@ -73,7 +73,7 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 						<h3 class="text-sm font-bold text-slate-400 mb-4 uppercase tracking-widest">Tech Stack</h3>
 						<div class="flex flex-wrap gap-3">
 							{skills.map((tech) => (
-								<span class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:border-cyan-500/30 hover:text-cyan-300 transition-all cursor-default hover:-translate-y-1">
+								<span class="tech-badge px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:border-cyan-500/30 hover:text-cyan-300 transition-all cursor-default">
 									{tech}
 								</span>
 							))}
@@ -93,8 +93,12 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 				Experiencia
 			</h2>
 			<div class="space-y-12 border-l border-white/10 ml-3 pl-12 relative">
+				<!-- Línea animada (Tracer) -->
+				<div class="absolute left-[-1px] top-0 bottom-0 w-px overflow-hidden">
+					<div class="w-full h-40 bg-gradient-to-t from-transparent via-white/10 to-transparent absolute -bottom-40 animate-scan"></div>
+				</div>
 				{experience.map((job, index) => (
-					<article class={`reveal ${index % 2 === 0 ? 'reveal-left' : 'reveal-right'} relative`} style={`transition-delay: ${index * 100}ms`}>
+					<article class={`reveal ${index % 2 === 0 ? 'reveal-left' : 'reveal-right'} relative focus:outline-none`} style={`transition-delay: ${index * 100}ms`} tabindex="0">
 						<span class="absolute -left-14 top-2 w-4 h-4 rounded-full border border-white/20 bg-slate-950 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
 							<span class="absolute inset-0 rounded-full bg-blue-500 opacity-50 animate-ping"></span>
 							<span class="absolute inset-0 rounded-full bg-blue-500"></span>
@@ -126,6 +130,17 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 			<p>&copy; {new Date().getFullYear()} {personalInfo.name}. Todos los derechos reservados.</p>
 		</footer>
 	</main>
+
+	<style>
+		@keyframes scan {
+			0% { bottom: -10rem; }
+			40% { bottom: 100%; }
+			100% { bottom: 100%; }
+		}
+		.animate-scan {
+			animation: scan 6s linear infinite;
+		}
+	</style>
 
 	<script>
 		const canvas = document.getElementById('bg-canvas') as HTMLCanvasElement;
@@ -165,7 +180,19 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 			}
 			
 			reset() {
-				this.x = Math.floor(Math.random() * (width / DOT_SPACING)) * DOT_SPACING;
+				// Lógica para aparecer solo en laterales en pantallas grandes (evitar centro)
+				const contentWidth = 900;
+				const sideMargin = (width - contentWidth) / 2;
+				
+				if (width > 1024 && sideMargin > DOT_SPACING) {
+					const validX = [];
+					for (let x = 0; x < width; x += DOT_SPACING) {
+						if (x < sideMargin || x > width - sideMargin) validX.push(x);
+					}
+					this.x = validX.length > 0 ? validX[Math.floor(Math.random() * validX.length)] : Math.floor(Math.random() * (width / DOT_SPACING)) * DOT_SPACING;
+				} else {
+					this.x = Math.floor(Math.random() * (width / DOT_SPACING)) * DOT_SPACING;
+				}
 				this.y = Math.floor(Math.random() * (height / DOT_SPACING)) * DOT_SPACING;
 				this.targetX = this.x;
 				this.targetY = this.y;
@@ -214,7 +241,17 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 						const nextX = this.x + dir.dx;
 						const nextY = this.y + dir.dy;
 						
-						if (nextX >= 0 && nextX <= width && nextY >= 0 && nextY <= height) {
+						// Lógica de colisión: Bordes de pantalla y "zona segura" central
+						let isValid = nextX >= 0 && nextX <= width && nextY >= 0 && nextY <= height;
+						
+						if (isValid && width > 1024) {
+							const contentWidth = 900;
+							const sideMargin = (width - contentWidth) / 2;
+							// Si intenta entrar en la zona central, lo consideramos un muro
+							if (nextX > sideMargin && nextX < width - sideMargin) isValid = false;
+						}
+
+						if (isValid) {
 							this.targetX = nextX;
 							this.targetY = nextY;
 							this.dirX = dir.dx;

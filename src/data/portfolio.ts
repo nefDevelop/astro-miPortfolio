@@ -1,6 +1,6 @@
 export const personalInfo = {
   name: "Neftalí",
-  role: "Desarrollador Full Stack",
+  role: "Desarrollador Web",
   description: "Creo soluciones digitales minimalistas, funcionales y memorables.",
   social: {
     github: "https://github.com/",
@@ -26,12 +26,6 @@ export interface Job {
 }
 
 export const experience: Job[] = [
-  {
-    title: "Senior Frontend Dev",
-    company: "Tech Solutions Inc.",
-    period: "2021 - Presente",
-    desc: "Liderando el desarrollo de la nueva plataforma SaaS utilizando React y Next.js.",
-  },
   {
     title: "Full Stack Developer",
     company: "Creative Agency",
