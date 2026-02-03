@@ -40,6 +40,24 @@ const { title, showSplash = true } = Astro.props;
 			}
 			window.scrollTo(0, 0);
 		</script>
+		<script is:inline>
+			// Decide si mostrar la animación de bienvenida (splash + hero)
+			const GREETING_EXPIRATION_MS = 1 * 60 * 1000; // 1 minuto
+			const lastGreetingTime = sessionStorage.getItem('greetingTime');
+			const now = new Date().getTime();
+
+			if (lastGreetingTime && (now - parseInt(lastGreetingTime, 10) < GREETING_EXPIRATION_MS)) {
+				// Si NO ha expirado, preparamos para SALTAR la animación
+				window.showGreetingAnimation = false;
+				document.documentElement.classList.add('greeting-shown');
+			} else {
+				// Si ha expirado o es la primera vez, preparamos para MOSTRAR la animación
+				window.showGreetingAnimation = true;
+				document.documentElement.classList.remove('greeting-shown');
+				sessionStorage.setItem('greetingTime', now.toString());
+			}
+		</script>
+		<slot name="head" />
 	</head>
 	<body class="bg-[#0a0a0a] text-slate-200 font-['Onest',sans-serif] antialiased selection:bg-cyan-500 selection:text-black overflow-x-hidden">
 		<div class="fixed top-0 left-0 z-[-2] h-full w-full bg-[#0a0a0a] overflow-hidden" aria-hidden="true">
@@ -48,6 +66,7 @@ const { title, showSplash = true } = Astro.props;
 			<div class="absolute -top-40 -left-40 w-[500px] h-[500px] bg-white/5 rounded-[3rem] blur-2xl animate-float-1"></div>
 			<div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-white/5 rounded-[3rem] blur-2xl animate-float-2"></div>
 		</div>
+		<canvas id="bg-canvas" class="fixed inset-0 z-[-1] w-full h-full" aria-hidden="true"></canvas>
 
 		<!-- Intro / Splash Screen -->
 		{showSplash && (
@@ -59,6 +78,11 @@ const { title, showSplash = true } = Astro.props;
 		<slot />
 
 		<style is:global>
+			html {
+				/* Reserva espacio para la barra de scroll para evitar saltos de layout */
+				scrollbar-gutter: stable;
+			}
+
 			/* Accesibilidad: Focus Visible Global */
 			:focus-visible {
 				outline: 2px solid #22d3ee; /* cyan-400 */
@@ -80,6 +104,14 @@ const { title, showSplash = true } = Astro.props;
 			}
 			.reveal-right {
 				transform: translateX(6rem); /* Viene de la derecha */
+			}
+
+			/* Si ya se mostró el saludo, desactivar animación de entrada en Hero */
+			.greeting-shown .hero-section .reveal {
+				opacity: 1 !important;
+				transform: none !important;
+				animation: none !important;
+				transition: none !important;
 			}
 
 			.reveal.active {
@@ -123,11 +155,42 @@ const { title, showSplash = true } = Astro.props;
 			}
 
 			@media (max-width: 768px) {
-				/* Ajusta el radio de las tarjetas de proyecto para que solo las esquinas superiores sean redondeadas en móvil. */
-				.project-slide > div > div {
-					border-radius: 0 0 1rem 1rem !important;
+				/* 1. El contenedor principal del slide se convierte en Flex Column */
+				.project-slide {
+					display: flex !important;
+					flex-direction: column !important;
 					justify-content: flex-start !important;
-					gap: 2rem !important;
+					padding-top: 5rem !important; /* Espacio para el header */
+				}
+
+				/* 2. La imagen deja de ser absoluta y ocupa un espacio fijo arriba */
+				.project-slide img {
+					position: relative !important;
+					top: auto !important;
+					left: auto !important;
+					transform: none !important;
+					width: 100% !important;
+					height: 40vh !important; /* Altura controlada para la imagen */
+					min-height: 250px !important;
+					flex-shrink: 0 !important;
+					border-radius: 1rem !important;
+					margin-bottom: 2rem !important; /* Espacio entre imagen y texto */
+				}
+
+				/* 3. El contenedor del texto deja de ser absoluto (inset-0) y fluye debajo */
+				.project-slide > div {
+					position: relative !important;
+					inset: auto !important;
+					width: 100% !important;
+					height: auto !important;
+					padding: 0 1.5rem 2rem 1.5rem !important; /* Padding lateral y inferior */
+					justify-content: flex-start !important;
+				}
+
+				/* 4. Ajustes internos del texto */
+				.project-slide > div > div {
+					width: 100% !important;
+					margin: 0 !important;
 				}
 			}
 
@@ -250,6 +313,12 @@ const { title, showSplash = true } = Astro.props;
 		</style>
 
 		<script>
+			declare global {
+				interface Window {
+					showGreetingAnimation: boolean;
+				}
+			}
+
 			const observer = new IntersectionObserver((entries) => {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting) {
@@ -269,6 +338,23 @@ const { title, showSplash = true } = Astro.props;
 				const splash = document.getElementById('splash');
 				const splashText = document.getElementById('splash-text');
 				const targetDot = document.getElementById('target-dot');
+
+				// Comprobación para saltar la animación del splash si ya se ha visto
+				// La variable `window.showGreetingAnimation` se define en un script en el <head>
+				if (window.showGreetingAnimation === false) {
+					if (splash) {
+						splash.remove();
+					}
+					document.body.style.overflow = ''; // Habilitar scroll
+					// Activar todas las animaciones de scroll-reveal inmediatamente
+					document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+					if (targetDot) {
+						targetDot.style.opacity = '1';
+					}
+					return; // Salir para no ejecutar la lógica del splash
+				}
+
+				// Lógica del Splash Screen (si no se ha saltado)
 				if (!splash || !splashText) return;
 
 				// Detectar idioma del navegador
@@ -556,6 +642,225 @@ const { title, showSplash = true } = Astro.props;
 			} else {
 				initProjects();
 				initTechBadges();
+			}
+
+			// Background Animation (Dots & Tracers)
+			const canvas = document.getElementById('bg-canvas') as HTMLCanvasElement;
+			if (canvas) {
+				const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+				
+				let width = 0;
+				let height = 0;
+				let scrollY = 0;
+				let dots: {x: number, y: number}[] = [];
+				
+				// Configuración
+				const DOT_SPACING = 30;
+				const LINE_SPEED = 2;
+				
+				class Tracer {
+					x: number;
+					y: number;
+					targetX: number;
+					targetY: number;
+					dirX: number;
+					dirY: number;
+					color: string;
+					history: {x: number, y: number}[];
+					maxHistory: number;
+
+					constructor(color: string) {
+						this.color = color;
+						this.x = 0;
+						this.y = 0;
+						this.targetX = 0;
+						this.targetY = 0;
+						this.dirX = 0;
+						this.dirY = 0;
+						this.history = [];
+						this.maxHistory = 15;
+						this.reset();
+					}
+					
+					reset() {
+						// Lógica para aparecer solo en laterales en pantallas grandes (evitar centro)
+						const contentWidth = 900;
+						const sideMargin = (width - contentWidth) / 2;
+						
+						if (width > 1024 && sideMargin > DOT_SPACING) {
+							const validX = [];
+							for (let x = 0; x < width; x += DOT_SPACING) {
+								if (x < sideMargin || x > width - sideMargin) validX.push(x);
+							}
+							this.x = validX.length > 0 ? validX[Math.floor(Math.random() * validX.length)] : Math.floor(Math.random() * (width / DOT_SPACING)) * DOT_SPACING;
+						} else {
+							this.x = Math.floor(Math.random() * (width / DOT_SPACING)) * DOT_SPACING;
+						}
+						this.y = Math.floor(Math.random() * (height / DOT_SPACING)) * DOT_SPACING;
+						this.targetX = this.x;
+						this.targetY = this.y;
+						this.dirX = 0;
+						this.dirY = 0;
+						this.history = [];
+						this.maxHistory = 15;
+					}
+					
+					update() {
+						const dx = this.targetX - this.x;
+						const dy = this.targetY - this.y;
+						const dist = Math.sqrt(dx * dx + dy * dy);
+						
+						if (dist < LINE_SPEED) {
+							this.x = this.targetX;
+							this.y = this.targetY;
+							
+							this.history.push({x: this.x, y: this.y});
+							if (this.history.length > this.maxHistory) this.history.shift();
+							
+							const directions = [
+								{dx: DOT_SPACING, dy: 0},
+								{dx: -DOT_SPACING, dy: 0},
+								{dx: 0, dy: DOT_SPACING},
+								{dx: 0, dy: -DOT_SPACING}
+							];
+							
+							// Filtrar dirección opuesta para evitar giros de 180 grados
+							const validDirections = directions.filter(d => 
+								this.dirX === 0 && this.dirY === 0 ? true : !(d.dx === -this.dirX && d.dy === -this.dirY)
+							);
+
+							// Intentar encontrar una dirección válida
+							let validDir = false;
+							let attempts = 0;
+							while (!validDir && attempts < 10) {
+								let dir;
+								// 80% de probabilidad de mantener la dirección (inercia) para hacerlas más directas
+								if ((this.dirX !== 0 || this.dirY !== 0) && Math.random() < 0.8) {
+									dir = { dx: this.dirX, dy: this.dirY };
+								} else {
+									dir = validDirections[Math.floor(Math.random() * validDirections.length)];
+								}
+
+								const nextX = this.x + dir.dx;
+								const nextY = this.y + dir.dy;
+								
+								// Lógica de colisión: Bordes de pantalla y "zona segura" central
+								let isValid = nextX >= 0 && nextX <= width && nextY >= 0 && nextY <= height;
+								
+								if (isValid && width > 1024) {
+									const contentWidth = 900;
+									const sideMargin = (width - contentWidth) / 2;
+									// Si intenta entrar en la zona central, lo consideramos un muro
+									if (nextX > sideMargin && nextX < width - sideMargin) isValid = false;
+								}
+
+								if (isValid) {
+									this.targetX = nextX;
+									this.targetY = nextY;
+									this.dirX = dir.dx;
+									this.dirY = dir.dy;
+									validDir = true;
+								} else {
+									this.dirX = 0;
+									this.dirY = 0;
+								}
+								attempts++;
+							}
+						} else {
+							this.x += (dx / dist) * LINE_SPEED;
+							this.y += (dy / dist) * LINE_SPEED;
+						}
+					}
+					
+					draw(ctx: CanvasRenderingContext2D, mapY: (y: number) => number) {
+						ctx.beginPath();
+						const allPoints = [...this.history, {x: this.x, y: this.y}];
+						
+						if (allPoints.length > 0) {
+							const startY = mapY(allPoints[0].y);
+							ctx.moveTo(allPoints[0].x, startY);
+							
+							for (let i = 1; i < allPoints.length; i++) {
+								const currY = mapY(allPoints[i].y);
+								const prevY = mapY(allPoints[i-1].y);
+								
+								// Si la distancia es muy grande, es porque hubo un salto por el wrapping (paralaje infinito)
+								if (Math.abs(currY - prevY) > height / 2) {
+									ctx.moveTo(allPoints[i].x, currY);
+								} else {
+									ctx.lineTo(allPoints[i].x, currY);
+								}
+							}
+						}
+						
+						ctx.strokeStyle = this.color;
+						ctx.lineWidth = 2;
+						ctx.lineCap = 'round';
+						ctx.lineJoin = 'round';
+						ctx.shadowColor = this.color;
+						ctx.shadowBlur = 8;
+						ctx.stroke();
+						ctx.shadowBlur = 0;
+					}
+				}
+
+				let tracers: Tracer[] = [];
+
+				function resize() {
+					width = window.innerWidth;
+					height = window.innerHeight;
+					canvas.width = width;
+					canvas.height = height;
+					
+					dots = [];
+					for (let x = 0; x < width; x += DOT_SPACING) {
+						for (let y = 0; y < height; y += DOT_SPACING) {
+							dots.push({x, y});
+						}
+					}
+				}
+
+				function init() {
+					resize();
+					window.addEventListener('resize', resize);
+					window.addEventListener('scroll', () => scrollY = window.scrollY);
+					
+					tracers = [
+						new Tracer('#1e293b'), // Slate 800 (Gris más oscuro)
+						new Tracer('#0f172a')  // Slate 900 (Casi negro)
+					];
+					
+					animate();
+				}
+
+				function animate() {
+					ctx.clearRect(0, 0, width, height);
+
+					// Función para mapear Y con paralaje y wrapping infinito
+					const parallaxSpeed = 0.2;
+					const getScreenY = (y: number) => {
+						let sy = (y - scrollY * parallaxSpeed) % height;
+						if (sy < 0) sy += height;
+						return sy;
+					};
+					
+					// Dibujar puntos
+					ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+					ctx.beginPath();
+					dots.forEach(dot => {
+						ctx.rect(dot.x, getScreenY(dot.y), 2, 2);
+					});
+					ctx.fill();
+					
+					tracers.forEach(tracer => {
+						tracer.update();
+						tracer.draw(ctx, getScreenY);
+					});
+					
+					requestAnimationFrame(animate);
+				}
+
+				init();
 			}
 		</script>
 	</body>
