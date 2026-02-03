@@ -173,8 +173,9 @@ const { title, showSplash = true } = Astro.props;
 					height: 40vh !important; /* Altura controlada para la imagen */
 					min-height: 250px !important;
 					flex-shrink: 0 !important;
-					border-radius: 1rem !important;
+					border-radius: 0 0 1rem 1rem !important; /* Solo redondear abajo */
 					margin-bottom: 2rem !important; /* Espacio entre imagen y texto */
+					mask-image: linear-gradient(to top, black calc(100% - 1.5rem), transparent 100%) !important;
 				}
 
 				/* 3. El contenedor del texto deja de ser absoluto (inset-0) y fluye debajo */
