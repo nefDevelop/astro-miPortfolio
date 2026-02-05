@@ -4,13 +4,14 @@ import onestFont from '../data/Onest.ttf?url';
 interface Props {
 	title: string;
 	showSplash?: boolean;
+	lang?: string;
 }
 
-const { title, showSplash = true } = Astro.props;
+const { title, showSplash = true, lang = 'es' } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="es" class="scroll-smooth">
+<html lang={lang} class="scroll-smooth">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content="Portfolio de Desarrollador de Software" />
@@ -359,8 +360,8 @@ const { title, showSplash = true } = Astro.props;
 				// Lógica del Splash Screen (si no se ha saltado)
 				if (!splash || !splashText) return;
 
-				// Detectar idioma del navegador
-				const lang = navigator.language.split('-')[0];
+				// Usar el idioma del documento (establecido por Astro) o fallback al navegador
+				const lang = document.documentElement.lang || navigator.language.split('-')[0];
 				const greetings: Record<string, string> = {
 					es: 'Hola.',
 					en: 'Hello.',

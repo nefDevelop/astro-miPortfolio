@@ -2,9 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 import Projects from '../components/Projects.astro';
 import { personalInfo, about, skills, experience } from '../data/portfolio';
+import { ui } from '../i18n/translations';
+
+const currentLang = 'es'; // Cambiar a 'en' en la versión en inglés o usar Astro.params
+const t = ui[currentLang as keyof typeof ui];
 ---
 
-<Layout title="Portfolio | Desarrollador Web" showSplash={true}>
+<Layout title={t.meta.title} showSplash={true} lang={currentLang}>
 	<main>
 		<div class="container mx-auto px-4 pt-20 pb-0 max-w-4xl">
 		
@@ -15,10 +19,10 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 				  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
 				  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
 				</span>
-				Disponible para nuevos proyectos
+				{t.hero.available}
 			</div>
 			<h1 class="reveal text-5xl md:text-8xl font-extrabold tracking-tight delay-100 leading-tight">
-				<span id="profile-pronoun">Soy</span> <br/>
+				<span id="profile-pronoun">{t.hero.iam}</span> <br/>
 				<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-blue-300 to-purple-300">{personalInfo.name}</span><span id="target-dot" class="text-purple-300">.</span>
 			</h1>
 			<p class="reveal text-xl text-slate-200 max-w-2xl leading-relaxed delay-200 font-light">
@@ -64,7 +68,7 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 				<div class="reveal reveal-right space-y-6 delay-200">
 					<h2 class="text-4xl font-bold flex items-center gap-3 text-white">
 						<span class="w-12 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"></span>
-						Sobre mí
+						{t.about.title}
 					</h2>
 					<p class="text-slate-200 text-lg leading-relaxed focus:outline-none focus:text-white transition-colors" tabindex="0">
 						{about.description_1}
@@ -75,7 +79,7 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 					
 					<!-- Habilidades / Tech Stack -->
 					<div class="pt-4">
-						<h3 class="text-sm font-bold text-slate-200 mb-4 uppercase tracking-widest">Tech Stack</h3>
+						<h3 class="text-sm font-bold text-slate-200 mb-4 uppercase tracking-widest">{t.about.stack}</h3>
 						<div class="flex flex-wrap gap-3">
 							{skills.map((tech) => (
 								<span class="tech-badge px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-slate-200 hover:bg-white/10 hover:border-cyan-500/30 hover:text-cyan-300 transition-all cursor-default">
@@ -95,7 +99,7 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 
 			<h2 class="reveal text-4xl font-bold mb-16 flex items-center gap-3 text-white">
 				<span class="w-12 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
-				Experiencia
+				{t.experience.title}
 			</h2>
 			<div class="space-y-12 border-l border-white/10 ml-3 pl-12 relative">
 				<!-- Línea animada (Tracer) -->
@@ -124,7 +128,7 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 		<section id="proyectos" class="pt-20 pb-4">
 			<h2 class="reveal text-4xl font-bold mb-6 flex items-center gap-3 text-white">
 				<span class="w-12 h-1 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full"></span>
-				Proyectos Destacados
+				{t.projects.title}
 			</h2>
 		</section>
 		</div>
@@ -132,7 +136,7 @@ import { personalInfo, about, skills, experience } from '../data/portfolio';
 		<Projects />
 		
 		<footer class="reveal py-10 text-center text-slate-300 text-sm">
-			<p>&copy; {new Date().getFullYear()} {personalInfo.name}. Todos los derechos reservados.</p>
+			<p>&copy; {new Date().getFullYear()} {personalInfo.name}. {t.footer.rights}</p>
 		</footer>
 	</main>
 
