@@ -1,11 +1,17 @@
+import type { ImageMetadata } from "astro";
+import recipeNodeMain from "../assets/recipeNode-main.png";
+import recipeNodeMobile from "../assets/recipeNode-mobile.png";
+import recipeNodePlaning from "../assets/recipeNode-planning.png";
+import recipeNodeArch from "../assets/recipeNode-arch.png";
+
 export const personalInfo = {
   name: "Neftalí",
   role: "Desarrollador Web",
   description: "Creo soluciones digitales minimalistas, funcionales y memorables.",
   social: {
-    github: "https://github.com/",
+    github: "https://github.com/nefDevelop",
     linkedin: "https://linkedin.com/",
-    email: "mailto:contacto@ejemplo.com",
+    email: "mailto:nefdevelop@gmail.com",
   },
 };
 
@@ -27,9 +33,9 @@ export interface Job {
 
 export const experience: Job[] = [
   {
-    title: "Full Stack Developer",
-    company: "Creative Agency",
-    period: "2019 - 2021",
+    title: "GS Desarrollo de Aplicaciones Web",
+    company: "Ilerna",
+    period: "2024 - 2026",
     desc: "Desarrollo de sitios web corporativos y e-commerce con alto tráfico.",
   },
   {
@@ -43,7 +49,7 @@ export const experience: Job[] = [
 export interface Slide {
   title: string;
   desc: string;
-  image: string;
+  image: string | ImageMetadata;
   imageAlt?: string;
   tags?: string[];
   link?: string;
@@ -54,33 +60,39 @@ export interface Project {
   highlight: string;
   type: string;
   desc: string;
-  image: string;
+  image: string | ImageMetadata;
   imageAlt?: string;
   color: string;
   slides: Slide[];
 }
 
-export const projects: Project[] = [
+const projectsEs: Project[] = [
   {
-    title: "Neon",
-    highlight: "Market",
-    type: "01 / E-COMMERCE",
-    desc: "Plataforma de comercio inmersivo. La primera pantalla muestra el dashboard principal con métricas en tiempo real.",
-    image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1200&auto=format&fit=crop",
-    imageAlt: "Interfaz del dashboard de Neon mostrando gráficos de ventas y actividad de usuarios en tonos neón",
+    title: "Recipe",
+    highlight: "Node",
+    type: "01 / Recetas MD",
+    desc: "Plataforma de recetas basadas en archivos markdown.",
+    image: recipeNodeMain,
+    imageAlt: "Interfaz de la pagina princiapl de RecipeNode, mostrando las recetas.",
     color: "text-cyan-200",
     slides: [
       {
+        title: "Planning",
+        desc: "Planifica tu mes/semana y prepara la lista de la compra acorde a los ingredientes.",
+        image: recipeNodePlaning,
+        imageAlt: "Vista mensual de la planificacion de comidas.",
+      },
+      {
         title: "Arquitectura",
-        desc: "Construido sobre una arquitectura de microservicios para escalar horizontalmente durante eventos de alto tráfico.",
-        image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Diagrama abstracto de bloques brillantes representando la estructura de microservicios",
-        tags: ["React", "Node.js"],
+        desc: "Las recetas se almacenan en formato Markdown, se analizan con front-matter y marked, y se actualizan en tiempo real. El sistema aprovecha el poder de Markdown para una gestión de contenido flexible y legible.",
+        image: recipeNodeArch,
+        imageAlt: "Diagrama de arquitectura de RecipeNode mostrando el flujo de datos desde archivos Markdown hasta el cliente.",
+        tags: ["Node.js", "SQLite", "Socket.io"],
       },
       {
         title: "Experiencia Móvil",
-        desc: "Optimización completa para dispositivos móviles, logrando un aumento del 145% en conversiones.",
-        image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=800&auto=format&fit=crop",
+        desc: 'La aplicación está diseñada con un enfoque "mobile-first". La interfaz es completamente responsive, adaptándose a cualquier tamaño de pantalla.',
+        image: recipeNodeMobile,
         imageAlt: "Vista de la aplicación Neon en un teléfono móvil mostrando el catálogo de productos",
       },
     ],
@@ -110,3 +122,66 @@ export const projects: Project[] = [
     ],
   },
 ];
+
+const projectsEn: Project[] = [
+  {
+    title: "Recipe",
+    highlight: "Node",
+    type: "01 / MD Recipes",
+    desc: "Recipe platform based on markdown files.",
+    image: recipeNodeMain,
+    imageAlt: "RecipeNode main interface showing recipes.",
+    color: "text-cyan-200",
+    slides: [
+      {
+        title: "Planning",
+        desc: ".",
+        image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop",
+        imageAlt: "Abstract diagram of glowing blocks representing microservices structure",
+        tags: ["React", "Node.js"],
+      },
+      {
+        title: "Architecture",
+        desc: "Recipes are stored in Markdown format, parsed using front-matter and marked, and updated in real-time. The system leverages Markdown's power for flexible and readable content management.",
+        image: recipeNodeArch,
+        imageAlt: "Architecture diagram of RecipeNode showing the data flow from Markdown files to the client.",
+        tags: ["Node.js", "SQLite", "Socket.io"],
+      },
+      {
+        title: "Mobile Experience",
+        desc: 'The application is designed with a "mobile-first" approach. The interface is completely responsive, adapting to any screen size.',
+        image: recipeNodeMobile,
+        imageAlt: "View of the Neon application on a mobile phone showing the product catalog",
+      },
+    ],
+  },
+  {
+    title: "Nova",
+    highlight: "Bank",
+    type: "02 / FINTECH",
+    desc: "Digital banking redefined. Clear visualization of assets and real-time movements.",
+    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop",
+    imageAlt: "Nova app main screen showing total balance and monthly expense graph",
+    color: "text-emerald-200",
+    slides: [
+      {
+        title: "Instant Payments",
+        desc: "P2P payment system with biometric confirmation and zero latency.",
+        image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1000&auto=format&fit=crop",
+        imageAlt: "User making a contactless credit card payment via mobile terminal",
+      },
+      {
+        title: "Total Security",
+        desc: "End-to-end encryption and AI fraud detection.",
+        image: "https://images.unsplash.com/photo-1616077168079-7e09a677fb2c?q=80&w=1000&auto=format&fit=crop",
+        imageAlt: "Conceptual illustration of a glowing digital padlock on dark background representing cybersecurity",
+        link: "#",
+      },
+    ],
+  },
+];
+
+export const projects = {
+  es: projectsEs,
+  en: projectsEn,
+};
