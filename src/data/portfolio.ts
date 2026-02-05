@@ -17,9 +17,9 @@ export const personalInfo = {
 
 export const about = {
   description_1:
-    "Soy un desarrollador apasionado por la tecnología y el diseño limpio. Me encanta transformar ideas complejas en interfaces de usuario intuitivas y eficientes.",
+    "Técnico Superior DAW especializado en arquitecturas pragmáticas. Aplico el principio KISS para transformar problemas complejos en sistemas modulares y eficientes.",
   description_2:
-    "Cuando no estoy programando, me encontrarás explorando nuevas tecnologías, contribuyendo al código abierto o buscando la taza de café perfecta.",
+    "Me dedico a transformar requerimientos de negocio en experiencias de usuario fluidas, priorizando siempre la optimización del rendimiento y la accesibilidad.",
 };
 
 export const skills = ["JavaScript", "TypeScript", "React", "Astro", "Node.js", "Tailwind CSS", "Git"];
@@ -36,13 +36,13 @@ export const experience: Job[] = [
     title: "GS Desarrollo de Aplicaciones Web",
     company: "Ilerna",
     period: "2024 - 2026",
-    desc: "Desarrollo de sitios web corporativos y e-commerce con alto tráfico.",
+    desc: "Técnico Superior DAW | Full-Stack Developer Desarrollo de soluciones web escalables, integración de APIs, gestión de bases de datos y despliegue de aplicaciones multiplataforma.",
   },
   {
-    title: "Junior Developer",
-    company: "StartUp Local",
-    period: "2018 - 2019",
-    desc: "Mantenimiento de código legacy e implementación de nuevas features.",
+    title: "Certificado de Formación avanzada Backend: Python, Flask, Django ",
+    company: "Bejob colaboracion con IBM Skillsbuild",
+    period: "Marzo - Mayo 2025",
+    desc: "Python Backend: Flask, Django & Optimización Dominio de arquitectura web, bases de datos, testing automatizado y escalabilidad para aplicaciones de alto rendimiento.",
   },
 ];
 
@@ -74,7 +74,7 @@ const projectsEs: Project[] = [
     desc: "Plataforma de recetas basadas en archivos markdown.",
     image: recipeNodeMain,
     imageAlt: "Interfaz de la pagina princiapl de RecipeNode, mostrando las recetas.",
-    color: "text-cyan-200",
+    color: "text-green-600",
     slides: [
       {
         title: "Planning",
