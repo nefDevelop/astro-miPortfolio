@@ -7,13 +7,13 @@ const currentProjects = projects[lang as keyof typeof projects];
 
 <section class="relative">
 	{currentProjects.map((project) => (
-		<article class="project-container h-[150vh]">
+		<article class="project-container h-[125vh]">
 			<div class="project-sticky">
 				<div class="project-slider">
 					
 					<!-- Slide 1: Intro -->
-					<div class="project-slide relative w-full h-full overflow-hidden border-r border-white/5 focus:!opacity-100 focus:z-20 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-inset" tabindex="0" aria-label={`Introducción del proyecto ${project.title}`}>
-						<img src={typeof project.image === 'string' ? project.image : project.image.src} class="absolute top-0 left-0 md:top-1/2 md:-translate-y-1/2 md:left-10 w-full h-[60%] md:h-[60%] md:w-[80%] object-cover rounded-b-[3rem] md:rounded-[2rem] md:[mask-image:linear-gradient(to_right,black_50%,transparent_75%)]" alt={project.imageAlt || `Captura de pantalla del proyecto ${project.title}`} />
+					<div class="project-slide relative w-full h-full overflow-hidden border-r border-white/5" aria-label={`Introducción del proyecto ${project.title}`}>
+						<img src={typeof project.image === 'string' ? project.image : project.image.src} class={`absolute top-0 left-0 md:top-1/2 md:-translate-y-1/2 md:left-10 w-full h-[45%] md:h-auto md:w-[65%] md:aspect-video object-cover ${project.imagePosition || ''} rounded-b-[3rem] md:rounded-[2rem] md:[mask-image:linear-gradient(to_right,black_50%,transparent_75%)] shadow-2xl`} alt={project.imageAlt || `Captura de pantalla del proyecto ${project.title}`} />
 						<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
 							<div class="w-full md:w-1/2 md:ml-auto space-y-6 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
 								<span class={`${project.color} font-mono tracking-widest`}>{project.type}</span>
@@ -25,8 +25,8 @@ const currentProjects = projects[lang as keyof typeof projects];
 
 					<!-- Additional Slides -->
 					{project.slides.map((slide, index) => (
-						<div class="project-slide relative w-full h-full overflow-hidden border-r border-white/5 focus:!opacity-100 focus:z-20 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-inset" tabindex="0" aria-label={`Detalle: ${slide.title}`}>
-							<img src={typeof slide.image === 'string' ? slide.image : slide.image.src} class="absolute top-0 left-0 md:top-1/2 md:-translate-y-1/2 md:left-10 w-full h-[60%] md:h-[60%] md:w-[80%] object-cover rounded-b-[3rem] md:rounded-[2rem] md:[mask-image:linear-gradient(to_right,black_50%,transparent_75%)]" alt={slide.imageAlt || slide.title} />
+						<div class="project-slide relative w-full h-full overflow-hidden border-r border-white/5" aria-label={`Detalle: ${slide.title}`}>
+							<img src={typeof slide.image === 'string' ? slide.image : slide.image.src} class={`absolute top-0 left-0 md:top-1/2 md:-translate-y-1/2 md:left-10 w-full h-[45%] md:h-auto md:w-[65%] md:aspect-video object-cover ${slide.imagePosition || ''} rounded-b-[3rem] md:rounded-[2rem] md:[mask-image:linear-gradient(to_right,black_50%,transparent_75%)] shadow-2xl`} alt={slide.imageAlt || slide.title} />
 							<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
 								<div class="w-full md:w-1/2 md:ml-auto space-y-6 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
 									<h3 class="text-4xl font-bold text-white">{slide.title}</h3>
