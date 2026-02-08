@@ -103,33 +103,33 @@ const projectsEs: Project[] = [
       },
     ],
   },
-  {
-    title: "Nova",
-    highlight: "Bank",
-    type: "02 / FINTECH",
-    desc: "Banca digital redefinida. Visualización clara de activos y movimientos en tiempo real.",
-    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop",
-    imageAlt: "Pantalla principal de la app Nova mostrando el saldo total y gráfico de gastos mensuales",
-    imagePosition: "object-center md:object-left",
-    color: "text-emerald-200",
-    slides: [
-      {
-        title: "Pagos Instantáneos",
-        desc: "Sistema de pagos P2P con confirmación biométrica y cero latencia.",
-        image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Usuario realizando un pago sin contacto con tarjeta de crédito a través de terminal móvil",
-        imagePosition: "object-center md:object-left",
-      },
-      {
-        title: "Seguridad Total",
-        desc: "Encriptación de extremo a extremo y detección de fraude mediante IA.",
-        image: "https://images.unsplash.com/photo-1616077168079-7e09a677fb2c?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Ilustración conceptual de un candado digital brillante sobre fondo oscuro representando ciberseguridad",
-        imagePosition: "object-center md:object-left",
-        link: "#",
-      },
-    ],
-  },
+  // {
+  //   title: "Nova",
+  //   highlight: "Bank",
+  //   type: "02 / FINTECH",
+  //   desc: "Banca digital redefinida. Visualización clara de activos y movimientos en tiempo real.",
+  //   image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop",
+  //   imageAlt: "Pantalla principal de la app Nova mostrando el saldo total y gráfico de gastos mensuales",
+  //   imagePosition: "object-center md:object-left",
+  //   color: "text-emerald-200",
+  //   slides: [
+  //     {
+  //       title: "Pagos Instantáneos",
+  //       desc: "Sistema de pagos P2P con confirmación biométrica y cero latencia.",
+  //       image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1000&auto=format&fit=crop",
+  //       imageAlt: "Usuario realizando un pago sin contacto con tarjeta de crédito a través de terminal móvil",
+  //       imagePosition: "object-center md:object-left",
+  //     },
+  //     {
+  //       title: "Seguridad Total",
+  //       desc: "Encriptación de extremo a extremo y detección de fraude mediante IA.",
+  //       image: "https://images.unsplash.com/photo-1616077168079-7e09a677fb2c?q=80&w=1000&auto=format&fit=crop",
+  //       imageAlt: "Ilustración conceptual de un candado digital brillante sobre fondo oscuro representando ciberseguridad",
+  //       imagePosition: "object-center md:object-left",
+  //       link: "#",
+  //     },
+  //   ],
+  // },
 ];
 
 const projectsEn: Project[] = [
@@ -167,33 +167,33 @@ const projectsEn: Project[] = [
       },
     ],
   },
-  {
-    title: "Nova",
-    highlight: "Bank",
-    type: "02 / FINTECH",
-    desc: "Digital banking redefined. Clear visualization of assets and real-time movements.",
-    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop",
-    imageAlt: "Nova app main screen showing total balance and monthly expense graph",
-    imagePosition: "object-center md:object-left",
-    color: "text-emerald-200",
-    slides: [
-      {
-        title: "Instant Payments",
-        desc: "P2P payment system with biometric confirmation and zero latency.",
-        image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "User making a contactless credit card payment via mobile terminal",
-        imagePosition: "object-center md:object-left",
-      },
-      {
-        title: "Total Security",
-        desc: "End-to-end encryption and AI fraud detection.",
-        image: "https://images.unsplash.com/photo-1616077168079-7e09a677fb2c?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Conceptual illustration of a glowing digital padlock on dark background representing cybersecurity",
-        imagePosition: "object-center md:object-left",
-        link: "#",
-      },
-    ],
-  },
+  // {
+  //   title: "Nova",
+  //   highlight: "Bank",
+  //   type: "02 / FINTECH",
+  //   desc: "Digital banking redefined. Clear visualization of assets and real-time movements.",
+  //   image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop",
+  //   imageAlt: "Nova app main screen showing total balance and monthly expense graph",
+  //   imagePosition: "object-center md:object-left",
+  //   color: "text-emerald-200",
+  //   slides: [
+  //     {
+  //       title: "Instant Payments",
+  //       desc: "P2P payment system with biometric confirmation and zero latency.",
+  //       image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1000&auto=format&fit=crop",
+  //       imageAlt: "User making a contactless credit card payment via mobile terminal",
+  //       imagePosition: "object-center md:object-left",
+  //     },
+  //     {
+  //       title: "Total Security",
+  //       desc: "End-to-end encryption and AI fraud detection.",
+  //       image: "https://images.unsplash.com/photo-1616077168079-7e09a677fb2c?q=80&w=1000&auto=format&fit=crop",
+  //       imageAlt: "Conceptual illustration of a glowing digital padlock on dark background representing cybersecurity",
+  //       imagePosition: "object-center md:object-left",
+  //       link: "#",
+  //     },
+  //   ],
+  // },
 ];
 
 export const projects = {
