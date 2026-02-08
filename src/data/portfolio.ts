@@ -10,7 +10,7 @@ export const personalInfo = {
   description: "Creo soluciones digitales minimalistas, funcionales y memorables.",
   social: {
     github: "https://github.com/nefDevelop",
-    linkedin: "https://linkedin.com/in/neftali-dominguez-urda",
+    linkedin: "https://www.linkedin.com/in/neftal%C3%AD-dom%C3%ADnguez-urda/",
     email: "mailto:nefdevelop@gmail.com",
   },
 };
