@@ -9,7 +9,7 @@ imagePosition: "object-center"
 color: "text-blue-500"
 lang: "es"
 order: 2
-github: "https://github.com/nef734/regio"
+github: "https://github.com/nefDevelop/regio"
 ---
 
 ## El Desafío

@@ -9,6 +9,7 @@ imagePosition: "object-center md:object-left"
 color: "text-green-600"
 lang: "es"
 order: 1
+github: "https://github.com/nefDevelop/RecipeNode"
 ---
 
 ## El Desafío
