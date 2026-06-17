@@ -103,33 +103,39 @@ const projectsEs: Project[] = [
       },
     ],
   },
-  // {
-  //   title: "Nova",
-  //   highlight: "Bank",
-  //   type: "02 / FINTECH",
-  //   desc: "Banca digital redefinida. Visualización clara de activos y movimientos en tiempo real.",
-  //   image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop",
-  //   imageAlt: "Pantalla principal de la app Nova mostrando el saldo total y gráfico de gastos mensuales",
-  //   imagePosition: "object-center md:object-left",
-  //   color: "text-emerald-200",
-  //   slides: [
-  //     {
-  //       title: "Pagos Instantáneos",
-  //       desc: "Sistema de pagos P2P con confirmación biométrica y cero latencia.",
-  //       image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1000&auto=format&fit=crop",
-  //       imageAlt: "Usuario realizando un pago sin contacto con tarjeta de crédito a través de terminal móvil",
-  //       imagePosition: "object-center md:object-left",
-  //     },
-  //     {
-  //       title: "Seguridad Total",
-  //       desc: "Encriptación de extremo a extremo y detección de fraude mediante IA.",
-  //       image: "https://images.unsplash.com/photo-1616077168079-7e09a677fb2c?q=80&w=1000&auto=format&fit=crop",
-  //       imageAlt: "Ilustración conceptual de un candado digital brillante sobre fondo oscuro representando ciberseguridad",
-  //       imagePosition: "object-center md:object-left",
-  //       link: "#",
-  //     },
-  //   ],
-  // },
+  {
+    title: "re",
+    highlight: "GIO",
+    type: "02 / Reverse Proxy",
+    desc: "Reverse Proxy ligero en Go diseñado para proteger servicios internos con autenticación centralizada y seguridad avanzada.",
+    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=1200&auto=format&fit=crop",
+    imageAlt: "Representación de servidores y redes de alta seguridad",
+    imagePosition: "object-center",
+    color: "text-blue-500",
+    slides: [
+      {
+        title: "Seguridad 2FA",
+        desc: "Protección total con autenticación en dos pasos (TOTP) y secretos cifrados en reposo mediante AES-256-GCM.",
+        image: "https://images.unsplash.com/photo-1633265485768-3069c9b05862?q=80&w=1000&auto=format&fit=crop",
+        imageAlt: "Seguridad digital y cifrado",
+        tags: ["Go", "AES-256", "TOTP"],
+      },
+      {
+        title: "Mitigación Activa",
+        desc: "Sistema Fail2Ban de red integrado y protección contra ataques de DNS Rebinding y SSRF para servicios críticos.",
+        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop",
+        imageAlt: "Escudo de seguridad y código fuente",
+        tags: ["Security", "Network", "Fail2Ban"],
+      },
+      {
+        title: "Panel de Control",
+        desc: "Administración centralizada de servicios, políticas CSP dinámicas y auditoría inalterable de eventos en tiempo real.",
+        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
+        imageAlt: "Panel de control y analíticas",
+        link: "https://github.com/nef734/regio",
+      },
+    ],
+  },
 ];
 
 const projectsEn: Project[] = [
@@ -167,33 +173,39 @@ const projectsEn: Project[] = [
       },
     ],
   },
-  // {
-  //   title: "Nova",
-  //   highlight: "Bank",
-  //   type: "02 / FINTECH",
-  //   desc: "Digital banking redefined. Clear visualization of assets and real-time movements.",
-  //   image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop",
-  //   imageAlt: "Nova app main screen showing total balance and monthly expense graph",
-  //   imagePosition: "object-center md:object-left",
-  //   color: "text-emerald-200",
-  //   slides: [
-  //     {
-  //       title: "Instant Payments",
-  //       desc: "P2P payment system with biometric confirmation and zero latency.",
-  //       image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1000&auto=format&fit=crop",
-  //       imageAlt: "User making a contactless credit card payment via mobile terminal",
-  //       imagePosition: "object-center md:object-left",
-  //     },
-  //     {
-  //       title: "Total Security",
-  //       desc: "End-to-end encryption and AI fraud detection.",
-  //       image: "https://images.unsplash.com/photo-1616077168079-7e09a677fb2c?q=80&w=1000&auto=format&fit=crop",
-  //       imageAlt: "Conceptual illustration of a glowing digital padlock on dark background representing cybersecurity",
-  //       imagePosition: "object-center md:object-left",
-  //       link: "#",
-  //     },
-  //   ],
-  // },
+  {
+    title: "re",
+    highlight: "GIO",
+    type: "02 / Reverse Proxy",
+    desc: "Lightweight Reverse Proxy in Go designed to protect internal services with centralized authentication and advanced security.",
+    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=1200&auto=format&fit=crop",
+    imageAlt: "Representation of high-security servers and networks",
+    imagePosition: "object-center",
+    color: "text-blue-500",
+    slides: [
+      {
+        title: "2FA Security",
+        desc: "Complete protection with two-factor authentication (TOTP) and secrets encrypted at rest using AES-256-GCM.",
+        image: "https://images.unsplash.com/photo-1633265485768-3069c9b05862?q=80&w=1000&auto=format&fit=crop",
+        imageAlt: "Digital security and encryption",
+        tags: ["Go", "AES-256", "TOTP"],
+      },
+      {
+        title: "Active Mitigation",
+        desc: "Integrated network Fail2Ban system and protection against DNS Rebinding and SSRF attacks for critical services.",
+        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop",
+        imageAlt: "Security shield and source code",
+        tags: ["Security", "Network", "Fail2Ban"],
+      },
+      {
+        title: "Control Panel",
+        desc: "Centralized service management, dynamic CSP policies, and unalterable real-time event auditing.",
+        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
+        imageAlt: "Control panel and analytics",
+        link: "https://github.com/nef734/regio",
+      },
+    ],
+  },
 ];
 
 export const projects = {
