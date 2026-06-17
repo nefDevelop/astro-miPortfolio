@@ -1,4 +1,4 @@
-.PHONY: dev build preview install
+.PHONY: dev build preview install clean
 
 dev:
 	npm run dev
@@ -11,3 +11,6 @@ preview:
 
 install:
 	npm install
+
+clean:
+	rm -rf node_modules .astro dist
