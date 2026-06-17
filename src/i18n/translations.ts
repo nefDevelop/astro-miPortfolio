@@ -16,6 +16,9 @@ export const ui = {
     },
     projects: {
       title: "Proyectos Destacados",
+      caseStudy: "Leer caso de estudio",
+      viewRepo: "Ver Repositorio",
+      back: "Volver al inicio",
     },
     footer: {
       rights: "Todos los derechos reservados.",
@@ -43,6 +46,9 @@ export const ui = {
     },
     projects: {
       title: "Featured Projects",
+      caseStudy: "Read case study",
+      viewRepo: "View Repository",
+      back: "Back to home",
     },
     footer: {
       rights: "All rights reserved.",
