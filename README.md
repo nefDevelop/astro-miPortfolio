@@ -1,46 +1,63 @@
-# Astro Starter Kit: Basics
+# Portfolio - Neftalí
 
-```sh
-npm create astro@latest -- --template basics
-```
+Este es mi portafolio personal construido con **Astro**, diseñado con un enfoque minimalista, funcional y totalmente responsive. El proyecto utiliza un sistema de internacionalización (i18n) para soportar contenido en español e inglés.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🚀 Tecnologías
 
-## 🚀 Project Structure
+- **[Astro](https://astro.build/)** - Framework web para la máxima velocidad.
+- **[Tailwind CSS](https://tailwindcss.com/)** - Framework CSS orientado a utilidades para un diseño rápido y flexible.
+- **TypeScript** - Para un desarrollo más seguro y robusto.
+- **Content Collections** - Gestión de proyectos y casos de estudio mediante archivos Markdown.
+- **Makefile** - Automatización de tareas comunes (instalación, desarrollo, construcción).
 
-Inside of your Astro project, you'll see the following folders and files:
+## ✨ Características
+
+- **Internacionalización (i18n):** Soporte nativo para español e inglés en toda la interfaz.
+- **Diseño Mobile-First:** Optimizado para cualquier dispositivo.
+- **Sección de Proyectos Dinámica:** Presentación detallada con diapositivas y casos de estudio.
+- **Alto Rendimiento:** Aprovecha las islas de Astro y la generación de sitios estáticos (SSG).
+
+## 📂 Estructura del Proyecto
 
 ```text
 /
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+├── public/              # Archivos estáticos (favicons, etc.)
+├── src/
+│   ├── assets/          # Imágenes y recursos multimedia
+│   ├── components/      # Componentes reutilizables de Astro
+│   ├── content/         # Casos de estudio en Markdown (proyectos)
+│   ├── data/            # Datos principales (portfolio.ts)
+│   ├── i18n/            # Traducciones y configuración de idioma
+│   ├── layouts/         # Plantillas base
+│   └── pages/           # Rutas y páginas del sitio
+├── Makefile             # Comandos abreviados
+└── package.json         # Dependencias y scripts
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## 🛠️ Comandos
 
-## 🧞 Commands
+Puedes usar `npm` o el `Makefile` incluido para gestionar el proyecto:
 
-All commands are run from the root of the project, from a terminal:
+| Acción | Comando npm | Comando Make |
+| :--- | :--- | :--- |
+| Instalar dependencias | `npm install` | `make install` |
+| Iniciar servidor de desarrollo | `npm run dev` | `make dev` |
+| Construir para producción | `npm run build` | `make build` |
+| Previsualizar construcción | `npm run preview` | `make preview` |
+| Limpiar archivos temporales | - | `make clean` |
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## ⚙️ Personalización
 
-## 👀 Want to learn more?
+Para adaptar este portafolio a tus necesidades:
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+1.  **Información Personal:** Edita `src/data/portfolio.ts` para cambiar tu nombre, rol, redes sociales y lista de proyectos.
+2.  **Traducciones:** Modifica `src/i18n/translations.ts` para ajustar los textos de la interfaz.
+3.  **Proyectos:** Añade o edita archivos `.md` en `src/content/projects/` para los casos de estudio detallados.
+
+## 📄 Licencia
+
+Este proyecto es de código abierto. Siéntete libre de usarlo como base para tu propio portafolio.
+
+---
+
+Desarrollado con ❤️ por **Neftalí** - [GitHub](https://github.com/nefDevelop) | [LinkedIn](https://www.linkedin.com/in/neftal%C3%AD-dom%C3%ADnguez-urda/)
