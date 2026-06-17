@@ -3,6 +3,10 @@ import recipeNodeMain from "../assets/recipeNode-main.png";
 import recipeNodeMobile from "../assets/recipeNode-mobile.png";
 import recipeNodePlaning from "../assets/recipeNode-planning.png";
 import recipeNodeArch from "../assets/recipeNode-arch.png";
+import regioMain from "../assets/regio-main.png";
+import regio2fa from "../assets/regio-2fa.png";
+import regioBridges from "../assets/regio-bridges.png";
+import regioAdmin1 from "../assets/regio-admin-1.png";
 
 export const personalInfo = {
   name: "Neftalí",
@@ -108,30 +112,30 @@ const projectsEs: Project[] = [
     highlight: "GIO",
     type: "02 / Reverse Proxy",
     desc: "Reverse Proxy ligero en Go diseñado para proteger servicios internos con autenticación centralizada y seguridad avanzada.",
-    image: "https://images.unsplash.com/photo-1520085601670-ee14aa5fa3e8?q=80&w=1200&auto=format&fit=crop",
-    imageAlt: "Representación de servidores y redes de alta seguridad",
+    image: regioMain,
+    imageAlt: "Interfaz de inicio de sesión de reGIO",
     imagePosition: "object-center",
     color: "text-blue-500",
     slides: [
       {
         title: "Seguridad 2FA",
         desc: "Protección total con autenticación en dos pasos (TOTP) y secretos cifrados en reposo mediante AES-256-GCM.",
-        image: "https://images.unsplash.com/photo-1633265485768-3069c9b05862?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Seguridad digital y cifrado",
+        image: regio2fa,
+        imageAlt: "Configuración de autenticación en dos pasos en reGIO",
         tags: ["Go", "AES-256", "TOTP"],
       },
       {
         title: "Mitigación Activa",
         desc: "Sistema Fail2Ban de red integrado y protección contra ataques de DNS Rebinding y SSRF para servicios críticos.",
-        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Escudo de seguridad y código fuente",
+        image: regioBridges,
+        imageAlt: "Panel de administración de redes y puentes en reGIO",
         tags: ["Security", "Network", "Fail2Ban"],
       },
       {
         title: "Panel de Control",
         desc: "Administración centralizada de servicios, políticas CSP dinámicas y auditoría inalterable de eventos en tiempo real.",
-        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Panel de control y analíticas",
+        image: regioAdmin1,
+        imageAlt: "Vista del panel de administración de reGIO",
         link: "https://github.com/nef734/regio",
       },
     ],
@@ -178,30 +182,30 @@ const projectsEn: Project[] = [
     highlight: "GIO",
     type: "02 / Reverse Proxy",
     desc: "Lightweight Reverse Proxy in Go designed to protect internal services with centralized authentication and advanced security.",
-    image: "https://images.unsplash.com/photo-1520085601670-ee14aa5fa3e8?q=80&w=1200&auto=format&fit=crop",
-    imageAlt: "Representation of high-security servers and networks",
+    image: regioMain,
+    imageAlt: "reGIO login interface",
     imagePosition: "object-center",
     color: "text-blue-500",
     slides: [
       {
         title: "2FA Security",
         desc: "Complete protection with two-factor authentication (TOTP) and secrets encrypted at rest using AES-256-GCM.",
-        image: "https://images.unsplash.com/photo-1633265485768-3069c9b05862?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Digital security and encryption",
+        image: regio2fa,
+        imageAlt: "Two-factor authentication setup in reGIO",
         tags: ["Go", "AES-256", "TOTP"],
       },
       {
         title: "Active Mitigation",
         desc: "Integrated network Fail2Ban system and protection against DNS Rebinding and SSRF attacks for critical services.",
-        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Security shield and source code",
+        image: regioBridges,
+        imageAlt: "Network and bridge management panel in reGIO",
         tags: ["Security", "Network", "Fail2Ban"],
       },
       {
         title: "Control Panel",
         desc: "Centralized service management, dynamic CSP policies, and unalterable real-time event auditing.",
-        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
-        imageAlt: "Control panel and analytics",
+        image: regioAdmin1,
+        imageAlt: "reGIO administration panel view",
         link: "https://github.com/nef734/regio",
       },
     ],
