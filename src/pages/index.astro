@@ -133,7 +133,8 @@ const t = ui[currentLang as keyof typeof ui];
 		
 		<Projects />
 		
-		<footer class="reveal py-10 text-center text-slate-300 text-sm">
+		<footer class="reveal py-10 flex flex-col items-center gap-4 text-slate-300 text-sm">
+			<img src="/favicon.svg" alt="Logo" class="w-8 h-8 opacity-50 hover:opacity-100 transition-opacity duration-300" />
 			<p>&copy; {new Date().getFullYear()} {personalInfo.name}. {t.footer.rights}</p>
 		</footer>
 	</main>
