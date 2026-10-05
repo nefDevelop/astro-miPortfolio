@@ -1,0 +1,432 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Layout from '../../../layouts/Layout.astro';
+import { ui, type Locale } from '../../../i18n/translations';
+import { localePath } from '../../../lib/paths';
+import { projects } from '../../../data/portfolio';
+import PlateMarks from '../../../components/PlateMarks.astro';
+
+export async function getStaticPaths() {
+	const projects = await getCollection('projects');
+
+	return projects.map((project) => ({
+		params: { lang: project.data.lang, slug: project.data.route },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+const { Content } = await project.render();
+const lang = project.data.lang as Locale;
+const t = ui[lang];
+
+// Toda la presentación sale de portfolio.ts y no del frontmatter del .md: los
+// dos ficheros llevaban el mismo dato copiado con textos distintos, y se
+// veía: la portada decía "Recetas Markdown" y el caso "Recetas MD". El .md
+// solo aporta el cuerpo del texto y los campos de identificación de la ruta.
+const ficha = projects[lang].find((p) => p.slug === project.data.route);
+
+// Anterior / siguiente dentro del mismo idioma, por el campo `order`.
+const siblings = (
+	await getCollection('projects', ({ data }) => data.lang === lang)
+)
+	.sort((a, b) => a.data.order - b.data.order)
+	.map((entry) => ({ route: entry.data.route, title: `${entry.data.title}${entry.data.highlight ?? ''}` }));
+const currentIndex = siblings.findIndex((entry) => entry.route === project.data.route);
+const previous = siblings[currentIndex - 1];
+const next = siblings[currentIndex + 1];
+
+const description = ficha?.desc ?? '';
+---
+
+<Layout
+	title={`${project.data.title}${project.data.highlight ?? ''} — ${t.projects.caseStudy}`}
+	description={description}
+	lang={lang}
+	path={`projects/${project.data.route}`}
+>
+	<article class="mx-auto max-w-3xl px-5 pb-8 pt-14">
+		<a href={`/${lang}/`} class="meta link-underline">&larr; {t.projects.back}</a>
+
+		<header class="mt-10" data-reveal>
+			<p class="meta">{ficha?.type ?? ''}</p>
+			<h1 class="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
+				{project.data.title}<span class="text-dot">{project.data.highlight}</span>
+			</h1>
+			<p class="mt-5 text-xl leading-relaxed text-muted">{description}</p>
+		</header>
+
+		<dl class="mt-10 grid gap-4 border-y border-hair py-6 sm:grid-cols-2" data-reveal>
+			<div>
+				<dt class="meta">{t.projects.roleLabel}</dt>
+				<dd class="mt-1">{t.projects.roleValue}</dd>
+			</div>
+			<div>
+				<dt class="meta">Stack</dt>
+				<dd class="mt-1 flex flex-wrap gap-2">
+					{
+						(ficha?.stack ?? []).map((tech) => (
+							<span class="chip rounded-full border border-hair px-2.5 py-1 font-mono text-xs uppercase tracking-widest">
+								{tech}
+							</span>
+						))
+					}
+				</dd>
+			</div>
+		</dl>
+
+		<figure class="relative mt-10 border border-hair bg-surface p-2" data-reveal data-plate>
+			<PlateMarks seed={1} />
+			<Image
+				src={ficha?.image}
+				alt={ficha?.imageAlt || project.data.title}
+				width={1200}
+				height={750}
+				class={`aspect-video w-full object-cover ${ficha?.imagePosition || ''}`}
+			/>
+		</figure>
+
+		<div class="case-body mt-12" data-reveal>
+			<Content />
+		</div>
+
+		{/* Las láminas. Antes estaban solo en la portada, así que la página de
+		    caso ofrecía menos evidencia visual que el listado: el clic de mayor
+		    intención del sitio enseñaba una sola captura. */}
+		{
+			ficha?.slides?.length && (
+				<section class="mt-14">
+					<h2 class="meta text-dot">{t.projects.details}</h2>
+					<div class="mt-6 grid gap-10 sm:grid-cols-2">
+						{ficha.slides.map((slide, s) => (
+							<figure class="relative flex flex-col border border-hair bg-surface p-2" data-plate>
+								<PlateMarks seed={s + 11} />
+								<Image
+									src={slide.image}
+									alt={slide.imageAlt || slide.title}
+									width={800}
+									height={600}
+									widths={[400, 800]}
+									sizes="(min-width: 640px) 34vw, 100vw"
+									loading="lazy"
+									class={`aspect-[4/3] w-full object-cover ${slide.imagePosition || ''}`}
+								/>
+								<figcaption class="flex flex-1 flex-col gap-2 p-3">
+									<h3 class="font-semibold">{slide.title}</h3>
+									<p class="text-sm leading-relaxed text-muted">{slide.desc}</p>
+									{slide.tags && (
+										<ul class="mt-auto flex flex-wrap gap-2 pt-2">
+											{slide.tags.map((tag) => (
+												<li class="font-mono text-xs uppercase tracking-widest text-dot">{tag}</li>
+											))}
+										</ul>
+									)}
+								</figcaption>
+							</figure>
+						))}
+					</div>
+				</section>
+			)
+		}
+
+		{
+			(ficha?.demo || ficha?.github) && (
+				<div class="mt-14 flex flex-wrap gap-3">
+					{ficha.demo && (
+						<a
+							href={ficha.demo}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="rounded-full bg-ink px-6 py-3 font-medium text-paper ink-btn"
+						>
+							{t.projects.liveDemo}
+						</a>
+					)}
+					{ficha.github && (
+						<a
+							href={ficha.github}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="rounded-full border border-hair px-6 py-3 font-medium wash"
+						>
+							{t.projects.viewRepo}
+						</a>
+					)}
+				</div>
+			)
+		}
+
+		<nav class="mt-20 grid gap-4 border-t border-hair pt-8 sm:grid-cols-2" aria-label={t.projects.title}>
+			{previous ? (
+				<a href={localePath(lang, `projects/${previous.route}`)} class="group">
+					<span class="meta">&larr; {t.projects.caseStudy}</span>
+					<span class="mt-1 block font-medium group-hover:underline group-focus-visible:underline">{previous.title}</span>
+				</a>
+			) : (
+				<span />
+			)}
+			{next && (
+				<a href={localePath(lang, `projects/${next.route}`)} class="group sm:text-right">
+					<span class="meta">{t.projects.caseStudy} &rarr;</span>
+					<span class="mt-1 block font-medium group-hover:underline group-focus-visible:underline">{next.title}</span>
+				</a>
+			)}
+		</nav>
+	</article>
+</Layout>
+
+<script>
+	// Los bloques ```mermaid del Markdown llegan como <pre><code class="language-mermaid">
+	// (astro.config.mjs los excluye de Shiki para que lleguen crudos). mermaid
+	// necesita DOM y navegador, así que el diagrama se dibuja aquí, en cliente, y
+	// solo en las páginas que llevan uno: si no hay bloques no se importa nada y
+	// el chunk de mermaid no se descarga.
+	//
+	// Sin JS se queda el código del diagrama en la página: se lee como fuente,
+	// que es un fallo aceptable frente a dejar un hueco.
+	const codigos = Array.from(document.querySelectorAll<HTMLElement>('pre > code.language-mermaid'));
+
+	if (codigos.length > 0) {
+		type Diagrama = { fuente: string; nodo: HTMLElement };
+
+		// Cada render necesita un id que no exista todavía en el documento; el
+		// contador evita que un re-render (cambio de tema) choque con el anterior.
+		let contador = 0;
+		let temaPintado = document.documentElement.classList.contains('dark') ? 'dark' : 'default';
+
+		// El SVG del primer pintado sustituye al <pre>, así que hay que guardar
+		// la fuente antes: es lo que se vuelve a pasar a mermaid en cada cambio
+		// de tema y lo que se muestra si el render falla.
+		const diagramas: Diagrama[] = codigos.map((codigo) => {
+			const pre = codigo.parentElement as HTMLPreElement | null;
+			return { fuente: codigo.textContent ?? '', nodo: pre ?? codigo };
+		});
+
+		// Si mermaid falla al interpretar, se va del DOM con el id provisional y
+		// se queda la fuente visible: mejor un bloque de código que un hueco.
+		const limpiarProvisionales = (id: string) => {
+			document.getElementById(id)?.remove();
+			document.getElementById(`d${id}`)?.remove();
+		};
+
+		const pintar = async () => {
+			const tema = document.documentElement.classList.contains('dark') ? 'dark' : 'default';
+			temaPintado = tema;
+
+			let mermaid: typeof import('mermaid').default;
+			try {
+				({ default: mermaid } = await import('mermaid'));
+				// Se re-inicializa en cada pintado porque el tema es una opción de
+				// inicialización: sin esto, alternar el tema dejaría los diagramas
+				// con los colores del arranque. suppressErrorRendering evita que
+				// mermaid inyecte su SVG de error en el body cuando falla el fuente:
+				// el catch de abajo ya se ocupa de conservar el código visible.
+				mermaid.initialize({ startOnLoad: false, theme: tema, securityLevel: 'strict', suppressErrorRendering: true });
+			} catch (error) {
+				// Sin mermaid se queda el código fuente en la página, que es el
+				// mismo estado que sin JS.
+				console.error('No se pudo cargar mermaid:', error);
+				return;
+			}
+
+			for (const diagrama of diagramas) {
+				const id = `mmd-${contador++}`;
+				try {
+					const { svg, bindFunctions } = await mermaid.render(id, diagrama.fuente);
+					let contenedor = diagrama.nodo;
+
+					// Primer pintado: el <pre> con el código fuente se sustituye
+					// por el contenedor del SVG. En los siguientes solo se cambia
+					// el interior, para no reinsertar nodos en el flujo.
+					if (contenedor.tagName === 'PRE') {
+						const div = document.createElement('div');
+						div.className = 'case-diagram';
+						contenedor.replaceWith(div);
+						contenedor = div;
+						diagrama.nodo = div;
+					}
+
+					contenedor.classList.remove('case-diagram--error');
+					contenedor.innerHTML = svg;
+					// Los enlaces de los nodos se activan al terminar el render.
+					bindFunctions?.(contenedor);
+				} catch (error) {
+					limpiarProvisionales(id);
+					console.error('No se pudo dibujar el diagrama:', error);
+					// Se muestra la fuente en lugar del diagrama roto.
+					if (diagrama.nodo.tagName !== 'PRE') {
+						diagrama.nodo.classList.add('case-diagram--error');
+						diagrama.nodo.textContent = diagrama.fuente;
+					}
+				}
+			}
+		};
+
+		void pintar();
+
+		// El tema vive en la clase .dark de <html> y lo altera el botón del nav
+		// sin avisar, así que se observa el atributo. Solo se repinta cuando el
+		// tema realmente cambia: la clase theme-changing, que dura 400 ms para
+		// transicionar los colores, entraría y salía del mismo valor y dispararía
+		// dos pintados inútiles por cada clic.
+		let espera = 0;
+		const observador = new MutationObserver(() => {
+			const tema = document.documentElement.classList.contains('dark') ? 'dark' : 'default';
+			if (tema === temaPintado) return;
+			window.clearTimeout(espera);
+			// Pequeño margen: el botón pone la clase y luego el atributo aria, y
+			// sin espera se renderiza con el tema nuevo a mitad del fundido.
+			espera = window.setTimeout(() => void pintar(), 50);
+		});
+		observador.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+	}
+</script>
+
+<style is:global>
+	/* El contenido viene de Markdown, así que necesita estilos globales. */
+	.case-body {
+		max-width: 68ch;
+	}
+
+	.case-body > * + * {
+		margin-top: 1.15em;
+	}
+
+	.case-body h2 {
+		font-size: 1.4rem;
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		margin-top: 2.4em;
+		padding-top: 1.2em;
+		border-top: 1px solid var(--hair);
+	}
+
+	.case-body h3 {
+		font-size: 1.05rem;
+		font-weight: 600;
+		margin-top: 1.8em;
+	}
+
+	.case-body p {
+		line-height: 1.75;
+		color: var(--muted);
+	}
+
+	.case-body strong {
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	.case-body a {
+		color: var(--dot);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	.case-body ul,
+	.case-body ol {
+		padding-left: 1.25rem;
+		color: var(--muted);
+	}
+
+	.case-body ul {
+		list-style: none;
+		padding-left: 0;
+	}
+
+	.case-body li {
+		position: relative;
+		padding-left: 1.1rem;
+		line-height: 1.7;
+	}
+
+	.case-body li + li {
+		margin-top: 0.6rem;
+	}
+
+	.case-body li::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0.72em;
+		height: 1px;
+		width: 0.5rem;
+		background: var(--dot);
+	}
+
+	.case-body ol {
+		list-style: decimal;
+	}
+
+	.case-body ol li::before {
+		display: none;
+	}
+
+	.case-body code {
+		font-family: theme(fontFamily.mono);
+		font-size: 0.85em;
+		background: var(--surface);
+		border: 1px solid var(--hair);
+		border-radius: 0.25rem;
+		padding: 0.1em 0.35em;
+	}
+
+	.case-body pre {
+		background: var(--surface);
+		border: 1px solid var(--hair);
+		border-radius: 0.25rem;
+		padding: 1rem;
+		overflow-x: auto;
+		font-size: 0.85rem;
+	}
+
+	.case-body pre code {
+		border: 0;
+		padding: 0;
+		background: transparent;
+	}
+
+	.case-body blockquote {
+		border-left: 2px solid var(--dot);
+		padding-left: 1rem;
+		color: var(--muted);
+		font-style: italic;
+	}
+
+	.case-body img {
+		border: 1px solid var(--hair);
+		border-radius: 0.25rem;
+	}
+
+	/* Diagrama mermaid. Mientras no llega el SVG se ve el código fuente con el
+	   aspecto de cualquier bloque de código; después ocupa este contenedor. El
+	   min-height es el colchón para que el cambio de fuente a SVG no mueva el
+	   texto de abajo de golpe. */
+	.case-body .case-diagram {
+		min-height: 12rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow-x: auto;
+		background: var(--surface);
+		border: 1px solid var(--hair);
+		border-radius: 0.25rem;
+		padding: 1rem;
+	}
+
+	.case-body .case-diagram svg {
+		max-width: 100%;
+		height: auto;
+	}
+
+	/* El diagrama no se pudo dibujar: se muestra el fuente con el mismo aviso
+	   que cualquier error, sin romper el aspecto del resto de bloques. */
+	.case-body .case-diagram--error {
+		display: block;
+		font-family: theme(fontFamily.mono);
+		font-size: 0.85rem;
+		white-space: pre-wrap;
+		color: var(--muted);
+	}
+</style>
