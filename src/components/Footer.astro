@@ -1,0 +1,46 @@
+---
+import { ui, type Locale } from '../i18n/translations';
+import { personalInfo } from '../data/portfolio';
+import markSvg from '../assets/mark.svg?raw';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const year = new Date().getFullYear();
+
+// Se inyecta el SVG tal cual, solo añadiéndole tamaño y color: h-7 w-7 (28px)
+// replica el <img> anterior y text-ink fija currentColor a var(--ink).
+const marcaHtml = markSvg.replace(
+	'<svg ',
+	'<svg class="h-7 w-7 shrink-0 text-ink" aria-hidden="true" focusable="false" '
+);
+---
+
+<footer class="mt-24 border-t border-hair">
+	<div
+		class="mx-auto flex max-w-5xl flex-col gap-3 px-5 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between"
+	>
+		<p class="flex items-center gap-3">
+			{/* La marca es el propio trazado del favicon, para no mantener dos
+			    iconos distintos. Va inlineada y no como <img>: solo así
+			    currentColor hereda el color de la página y la marca sigue el
+			    tema al instante. Es decorativa: el texto ya nombra al autor. */}
+			<Fragment set:html={marcaHtml} />
+			<span>
+				<span class="block">{t.footer.builtWith} {personalInfo.fullName}.</span>
+				<span class="block text-xs opacity-70">© {year}. {t.footer.rights}</span>
+			</span>
+		</p>
+		<div class="flex items-center gap-4">
+			<a href={personalInfo.social.github} target="_blank" rel="noopener noreferrer" class="link-underline">
+				GitHub
+			</a>
+			<a href={personalInfo.social.linkedin} target="_blank" rel="noopener noreferrer" class="link-underline">
+				LinkedIn
+			</a>
+		</div>
+	</div>
+</footer>

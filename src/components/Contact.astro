@@ -1,0 +1,40 @@
+---
+import { ui, type Locale } from '../i18n/translations';
+import { personalInfo } from '../data/portfolio';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+
+<section id="contacto" class="mx-auto max-w-5xl scroll-mt-24 px-5 py-20">
+	<div class="border-t border-hair pt-10" data-reveal>
+		<h2 class="meta text-dot" data-nav-label={t.nav.label.contact}>{t.contact.title}</h2>
+		<p class="mt-5 max-w-2xl text-2xl font-medium leading-snug tracking-tight sm:text-3xl">
+			{t.contact.body}
+		</p>
+
+		<div class="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
+			<a
+				href={`mailto:${personalInfo.email}`}
+				class="link-underline font-mono text-base text-dot sm:text-lg"
+			>
+				{personalInfo.email}
+			</a>
+			<a href={personalInfo.social.github} target="_blank" rel="noopener noreferrer" class="link-underline text-sm">
+				GitHub
+			</a>
+			<a
+				href={personalInfo.social.linkedin}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="link-underline text-sm"
+			>
+				LinkedIn
+			</a>
+		</div>
+	</div>
+</section>

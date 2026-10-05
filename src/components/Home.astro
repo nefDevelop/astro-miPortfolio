@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from './Hero.astro';
+import Projects from './Projects.astro';
+import About from './About.astro';
+import Background from './Background.astro';
+import Contact from './Contact.astro';
+import { ui, type Locale } from '../i18n/translations';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+
+<Layout title={t.meta.title} description={t.meta.description} lang={lang}>
+	<Hero lang={lang} />
+	<Projects lang={lang} />
+	<About lang={lang} />
+	<Background lang={lang} />
+	<Contact lang={lang} />
+</Layout>

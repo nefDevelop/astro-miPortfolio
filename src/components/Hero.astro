@@ -1,0 +1,109 @@
+---
+import { ui, type Locale } from '../i18n/translations';
+import { personalInfo, positioning } from '../data/portfolio';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+
+/**
+ * Trazado de la rejilla: cada línea es un elemento para que llegue con su
+ * propio retardo, su propia duración y desde su propio origen. El ruido es
+ * determinista (hash del índice) para que la retícula sea la misma en cada
+ * build y se pueda depurar comparando capturas.
+ */
+const TILE = 40; // px — coincide con --bleed/2 del grid de 2.5rem
+const MAX_W = 2400;
+const MAX_H = 1400;
+
+const noise = (n: number) => {
+	const x = Math.sin(n * 12.9898) * 43758.5453;
+	return x - Math.floor(x);
+};
+
+type Line = { axis: 'v' | 'h'; pos: number; delay: number; duration: number; from: string };
+
+const build = (axis: 'v' | 'h', count: number, seed: number): Line[] =>
+	Array.from({ length: count }, (_, i) => {
+		const delay = Math.round(noise((i + seed) * 7.31) * 700);
+		const duration = 800 + Math.round(noise((i + seed) * 3.17) * 600);
+		const roll = noise((i + seed) * 11.7);
+		const from = axis === 'v' ? (roll > 0.5 ? 'from-bottom' : 'from-top') : roll > 0.5 ? 'from-right' : 'from-left';
+		return { axis, pos: i * TILE, delay, duration, from };
+	});
+
+const lines = [...build('v', Math.round(MAX_W / TILE), 0), ...build('h', Math.round(MAX_H / TILE), 100)];
+---
+
+<section class="relative isolate">
+	<div class="hero-grid" aria-hidden="true">
+		<div class="grid-field">
+		{
+			lines.map((line) => (
+				<span
+					class={
+						line.axis === 'v'
+							? `grid-line grid-line--v ${line.from}`
+							: `grid-line grid-line--h ${line.from}`
+					}
+					style={`--d:${line.delay}ms;--dur:${line.duration}ms;${line.axis === 'v' ? `left:${line.pos}px` : `top:${line.pos}px`}`}
+				/>
+			))
+		}
+		</div>
+	</div>
+
+	<div class="mx-auto max-w-5xl px-5 pb-24 pt-16 sm:pb-28 sm:pt-24">
+		<p class="meta flex items-center gap-2.5">
+			<span class="h-1.5 w-1.5 rounded-full bg-dot"></span>
+			{t.hero.available}
+		</p>
+
+		<h1
+			class="mt-7 text-6xl font-extrabold tracking-tight sm:text-7xl md:text-8xl lg:text-[7rem] lg:leading-[0.95]"
+		>
+			{personalInfo.name}<span class="relative inline-block"
+				><span class="dot-land text-dot">.</span>
+				{/* Plataforma de aterrizaje: se enciende en el mismo instante que el punto
+				    termina su vuelo, para que la rejilla lea como el sistema del que
+				    el punto forma parte. */}
+				<span
+					class="landing-pad pointer-events-none absolute bottom-[0.15rem] left-[1.5rem] hidden h-3.5 w-3.5 place-items-center lg:grid"
+					aria-hidden="true"
+				>
+					<span class="absolute h-px w-full bg-dot"></span>
+					<span class="absolute h-full w-px bg-dot"></span>
+					<span class="h-1.5 w-1.5 border border-dot"></span>
+				</span>
+			</span>
+		</h1>
+
+		<p class="mt-8 max-w-2xl text-2xl font-medium tracking-tight sm:text-3xl" data-nav-label={t.nav.label.role}>
+			{t.hero.role}
+		</p>
+
+		<p class="mt-4 font-mono text-xs uppercase tracking-[0.18em] text-muted sm:text-sm">
+			{positioning.stack.join(' · ')}
+		</p>
+
+		<p class="mt-6 max-w-prose text-lg leading-relaxed text-muted">{t.hero.goal}</p>
+
+		<div class="mt-9 flex flex-wrap items-center gap-3">
+			<a
+				href="#proyectos"
+				class="rounded-full bg-ink px-6 py-3 font-medium text-paper ink-btn"
+			>
+				{t.hero.ctaProjects}
+			</a>
+			<a
+				href={`mailto:${personalInfo.email}`}
+				class="rounded-full border border-hair px-6 py-3 font-medium wash"
+			>
+				{t.hero.ctaContact}
+			</a>
+		</div>
+	</div>
+</section>

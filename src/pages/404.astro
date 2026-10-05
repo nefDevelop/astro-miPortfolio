@@ -2,34 +2,59 @@
 import Layout from '../layouts/Layout.astro';
 import { ui } from '../i18n/translations';
 
-const t = ui.es; // Default a español para 404 estático, o detectar si es posible
+// 404 vive fuera de [lang]: un servidor estático sirve el mismo 404.html para
+// cualquier URL, así que no hay una versión por idioma que generar. Se
+// renderiza en español en el servidor y un script la sube al idioma del
+// visitante si este prefiere inglés. Sin JS se queda en español, que es
+// siempre una versión válida.
+const es = ui.es;
+const en = ui.en;
 ---
 
-<Layout title={`404 | ${t.notFound.title}`} showSplash={false} lang="es">
-	<main class="relative flex flex-col items-center justify-center min-h-screen overflow-hidden text-center px-4">
+<Layout title={`404 — ${es.notFound.title}`} description={es.notFound.desc} lang="es" noindex>
+	<section class="mx-auto flex min-h-[60vh] max-w-5xl flex-col justify-center px-5 py-20">
+		<p class="meta text-dot">404</p>
+		<h1 class="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl" data-404="title">
+			{es.notFound.title}
+		</h1>
+		<p class="mt-4 max-w-prose text-lg leading-relaxed text-muted" data-404="desc">
+			{es.notFound.desc}
+		</p>
 
-		<div class="relative z-10 space-y-6">
-			<h1 class="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 animate-pulse">
-				404
-			</h1>
-			
-			<div class="space-y-2">
-				<h2 class="text-3xl md:text-4xl font-bold text-white">
-					{t.notFound.title}
-				</h2>
-				<p class="text-slate-400 text-lg max-w-md mx-auto">
-					{t.notFound.desc}
-				</p>
-			</div>
-
-			<div class="pt-8">
-				<a href="/" class="inline-flex items-center gap-2 px-8 py-3 bg-white/5 border border-white/10 rounded-full text-white font-medium hover:bg-white/10 hover:border-cyan-500/50 hover:text-cyan-300 transition-all group hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-					</svg>
-					{t.notFound.back}
-				</a>
-			</div>
+		<div class="mt-8 flex flex-wrap gap-3">
+			<a
+				href="/es/"
+				aria-label={es.notFound.back}
+				data-404-label="notFound.back"
+				class="rounded-full bg-ink px-6 py-3 font-medium text-paper ink-btn"
+			>
+				<span data-404="back">ES</span>
+			</a>
+			<a
+				href="/en/"
+				aria-label={es.notFound.back}
+				data-404-label="notFound.back"
+				class="rounded-full border border-hair px-6 py-3 font-medium wash"
+			>
+				<span data-404="back">EN</span>
+			</a>
 		</div>
-	</main>
+	</section>
+
+	<script define:vars={{ en }}>
+		// El texto en español ya está en el HTML; aquí solo se sustituye si el
+		// visitante prefiere inglés. Se marca el lang del documento para que los
+		// lectores de pantalla no lean español a un visitante inglés.
+		if (!navigator.language.toLowerCase().startsWith('en')) return;
+		document.documentElement.lang = 'en';
+		for (const el of document.querySelectorAll('[data-404]')) {
+			const texto = en.notFound[el.dataset['404']];
+			if (texto) el.textContent = texto;
+		}
+		// Los botones solo dicen ES y EN; el nombre accesible cambia de idioma
+		// con el texto visible, no por separado.
+		for (const el of document.querySelectorAll('[data-404-label]')) {
+			el.setAttribute('aria-label', en.notFound.back);
+		}
+	</script>
 </Layout>

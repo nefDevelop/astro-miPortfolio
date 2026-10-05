@@ -1,0 +1,657 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Tokens
+   Dos temas con una sola variable por rol, para que los componentes no
+   weepan de "light" ni de "dark". La clase `dark` en <html> la fija el script
+   del <head> antes del primer paint, así que no hay destello de tema.
+--------------------------------------------------------------------------- */
+@layer base {
+  :root {
+    --paper: #f4f0e8;
+    --surface: #fbf8f2;
+    --ink: #123b2c;
+    /* Estado hover del boton solido: un punto mas claro. El texto no se toca,
+       asi que el contraste se queda en 9.8:1 en vez de caer a 7:1 como haria
+       un opacity sobre el boton entero. */
+    --ink-hover: #154332;
+    --muted: #5c6b63;
+    --hair: rgba(18, 59, 44, 0.16);
+    --dot: #c2410c;
+    --shadow: rgba(18, 59, 44, 0.12);
+    /* Alto de la cabecera. La rejilla la necesita para arrancar en y=0 */
+    --header-h: 4rem;
+  }
+
+  .dark {
+    --paper: #0e2b22;
+    --surface: #123328;
+    --ink: #f2ede4;
+    /* Aquí "más claro" sería hacia el blanco, que quemaría el texto: en tema
+       oscuro el hover va hacia abajo. Contraste final 9.5:1. */
+    --ink-hover: #d0ccc4;
+    --muted: #9db5a9;
+    --hair: rgba(242, 237, 228, 0.16);
+    --dot: #f5a524;
+    --shadow: rgba(0, 0, 0, 0.45);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Reserva la barra de scroll: evita saltos de layout entre páginas */
+    scrollbar-gutter: stable;
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--dot);
+    color: var(--paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--dot);
+    outline-offset: 3px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer components {
+  /* Rejilla del hero: textura de cuaderno técnico, se difumina hacia abajo.
+
+     El recorte va en un contenedor propio y no en la sección del hero: si la
+     sección llevara `overflow: hidden`, cortaría la retícula justo en su
+     borde superior, que es donde acaba el header, y la rejilla empezaría
+     debajo. Este contenedor sube justo lo que mide la cabecera, así que la
+     retícula arranca en y=0 y queda por detrás del nav. */
+  .hero-grid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--header-h) * -1);
+    bottom: 0;
+    z-index: -10;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .grid-field {
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: radial-gradient(ellipse 92% 85% at 50% 0, #000 25%, transparent 80%);
+    mask-image: radial-gradient(ellipse 92% 85% at 50% 0, #000 25%, transparent 80%);
+  }
+
+  /* Una línea por elemento: es lo que permite que cada una llegue con su propio
+     retardo, su propia duración y desde su propio origen. */
+  .grid-line {
+    position: absolute;
+    display: block;
+    background-color: var(--hair);
+  }
+
+  .grid-line--v {
+    top: 0;
+    width: 1px;
+    height: 100%;
+  }
+
+  .grid-line--h {
+    left: 0;
+    height: 1px;
+    width: 100%;
+  }
+
+  /* Trazado único al cargar, como si un plotter dibujara la retícula.
+     Solo `transform`: las líneas son de 1px, así que el coste por frame es
+     minúsculo y no hay repintados de capas grandes.
+     La curva es deliberadamente suave: con un ease-out muy agresivo todas las
+     líneas terminaban de dibujarse en los primeros 200 ms y el retardo
+     aleatorio de cada una dejaba de percibirse. */
+  @media (prefers-reduced-motion: no-preference) {
+    .grid-line {
+      animation-duration: var(--dur);
+      animation-delay: var(--d);
+      animation-timing-function: cubic-bezier(0.45, 0.05, 0.25, 1);
+      animation-fill-mode: both;
+    }
+
+    .grid-line--v {
+      animation-name: line-grow-y;
+      transform-origin: top;
+      --shift: -0.75rem;
+    }
+
+    .grid-line--h {
+      animation-name: line-grow-x;
+      transform-origin: left;
+      --shift: -0.75rem;
+    }
+
+    .from-bottom .grid-line--v {
+      transform-origin: bottom;
+      --shift: 0.75rem;
+    }
+
+    .from-right .grid-line--h {
+      transform-origin: right;
+      --shift: 0.75rem;
+    }
+  }
+
+/* Etiqueta del header: una casilla por carácter, posicionada en absoluto para
+     que mover una letra sea un transform y no un reflow. `is-morph` lo añade el
+     script al medir, así que sin JS las casillas siguen en flujo normal y el
+     nombre se lee igual. */
+  .nav-label {
+    display: inline-block;
+    vertical-align: bottom;
+    overflow: hidden;
+    transition: width 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  /* Sin transición a propósito: el script escribe transform y opacidad en cada
+     frame y pone transition:none mientras dura el viaje. El desvanecido de las
+     letras que se van lo dibuja el mismo bucle, no el CSS. */
+  .nav-slot {
+    display: inline-block;
+    white-space: pre;
+  }
+
+  .nav-label.is-morph {
+    position: relative;
+  }
+
+  .nav-label.is-morph .nav-slot {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-label,
+    .nav-slot {
+      transition: none;
+    }
+  }
+
+  /* La cabecera lleva glass siempre activo: hay retícula detrás y el blur es lo
+     que la difumina para que el nombre y los enlaces se lean encima.
+
+     Arriba del todo el blur es subpíxel a propósito, y está medido: con
+     blur(10px) la retícula conserva 1,0 de 33,1 unidades de contraste
+     (desaparece) y con blur(1px) sólo 8,1. Con blur(0.5px) conserva 23,7,
+     o sea el 72%: las líneas siguen leyéndose por detrás del nav y a la vez
+     se leen como material difuminado. El tinte del 30% ayuda a la legibilidad
+     del texto sin cortar la retícula.
+
+     Al hacer scroll, el glass sube a 85% y 12px: ahí ya hay contenido pasando
+     por debajo y lo que hace falta es separación, no ver la retícula. */
+  .site-header {
+    border-bottom: 1px solid var(--hair);
+    background-color: color-mix(in srgb, var(--paper) 30%, transparent);
+    backdrop-filter: blur(0.5px);
+    -webkit-backdrop-filter: blur(0.5px);
+    transition:
+      background-color 0.2s ease-out,
+      backdrop-filter 0.2s ease-out;
+  }
+
+  .is-scrolled .site-header {
+    background-color: color-mix(in srgb, var(--paper) 85%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Etiqueta mono para metadatos y numeración de secciones */
+  .meta {
+    font-family: theme(fontFamily.mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Subrayado dibujado al pasar el ratón, en lugar de un cambio de color */
+  /* Estados de interacción de los botones, en CSS y no con utilidades de
+     Tailwind, y por dos razones concretas:
+
+       1. Tailwind v3 compila `hover:` como un `:hover` a secas, sin
+          `@media (hover: hover)`. En táctil el hover se queda pegado tras el
+          tap y el botón parece activo.
+       2. El modificador de opacidad de Tailwind no se genera con estos tokens:
+          están declarados como `var(--ink)` a secas y Tailwind no puede
+          inyectar alfa en una variable suelta, así que `bg-ink/5` se
+          descartaba en silencio y esos seis hovers no existían. Con
+          `color-mix()` una regla cubre los dos temas, porque lee var(--ink). */
+
+  /* Botón fantasma: solo cambia el fondo. El 8% se nota al pasar el ratón sin
+     competir con el punto ámbar de la selección y del foco, que es un color
+     bastante más saturado. */
+  .wash {
+    transition: background-color 0.18s ease-out;
+  }
+  .wash:focus-visible {
+    background-color: color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+  @media (hover: hover) {
+    .wash:hover {
+      background-color: color-mix(in srgb, var(--ink) 8%, transparent);
+    }
+  }
+
+  /* Botón sólido: se aclara el fondo, no el texto. Con un opacity sobre el
+     botón entero el texto también se aclaraba y el contraste caía de 10.9:1 a
+     7:1. */
+  .ink-btn {
+    transition: background-color 0.18s ease-out;
+  }
+  .ink-btn:focus-visible {
+    background-color: var(--ink-hover);
+  }
+  @media (hover: hover) {
+    .ink-btn:hover {
+      background-color: var(--ink-hover);
+    }
+  }
+
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.25s ease-out;
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* Punto característico: aterriza con rebote y se queda */
+  .dot-land {
+    animation: dot-land 0.7s cubic-bezier(0.22, 0.8, 0.3, 1) 0.12s both;
+  }
+
+  /* Plataforma de aterrizaje en la rejilla: se enciende cuando el punto llega */
+  .landing-pad {
+    animation: pad-arrive 0.7s ease-out 0.12s both;
+  }
+}
+
+@layer utilities {
+  /* Centinela de scroll: 1px, invisible, sin contenido. */
+  #page-top {
+    height: 1px;
+  }
+
+  /* Revelado progresivo: `html.js` lo añade un script del <head>. Sin JS
+     nunca se añade la clase, así que el contenido se ve siempre. */
+  .js [data-reveal] {
+    opacity: 0;
+    transition:
+      opacity 0.55s ease-out,
+      transform 0.55s cubic-bezier(0.17, 0.55, 0.55, 1);
+    transform: translateY(0.75rem);
+  }
+
+  .js [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes line-grow-y {
+  from {
+    transform: translateY(var(--shift)) scaleY(0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes line-grow-x {
+  from {
+    transform: translateX(var(--shift)) scaleX(0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes dot-land {
+  0% {
+    transform: translate3d(-16rem, 7rem, 0) scale(0.55);
+    opacity: 0;
+  }
+  55% {
+    transform: translate3d(0.5rem, -0.45rem, 0) scale(1.4);
+    opacity: 1;
+  }
+  78% {
+    transform: translate3d(-0.3rem, 0.18rem, 0) scale(0.94);
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes pad-arrive {
+  0%,
+  70% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .dot-land,
+  .landing-pad {
+    animation: none;
+  }
+
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+	.link-underline {
+		transition: none;
+	}
+}
+
+/* ---------------------------------------------------------------------------
+   Chips de stack
+   El borde se cierra un punto al pasar el ratón. Va fuera de @layer a
+   propósito: `border-hair` es una utilidad de Tailwind y vive en @layer
+   utilities, así que ganaría en cascada a una regla de @layer components
+   aunque su especificidad fuera mayor. Mismo motivo que el bloque del tema
+   de más abajo.
+   --------------------------------------------------------------------------- */
+.chip {
+  /* La caja de línea de text-xs (1rem) centrada por métricas de la fuente
+     dejaba las mayúsculas un píxel por debajo del centro óptico del pill.
+     line-height:1 recoloca la baseline; los padding de cada componente se
+     ajustan a cambio para conservar la altura. */
+  line-height: 1;
+  transition:
+    border-color 0.18s ease-out,
+    background-color 0.18s ease-out;
+}
+
+@media (hover: hover) {
+  .chip:hover {
+    border-color: color-mix(in srgb, var(--ink) 45%, transparent);
+    background-color: color-mix(in srgb, var(--ink) 5%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Menú móvil
+   El <details> nativo oculta el panel de golpe al cerrar, así que solo la
+   entrada es animable: las animaciones CSS se disparan cuando el elemento
+   pasa a visible, es decir, en cada apertura. Fuera de @layer porque la
+   clase se construye en el componente (mismo motivo que plate-mark).
+   --------------------------------------------------------------------------- */
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}
+
+.menu-panel {
+  animation: menu-in 160ms ease-out;
+}
+
+/* Salida de los enlaces: se deslizan hacia fuera con cascada, como yéndose
+   por el borde derecho (el panel está anclado a la derecha). El <details>
+   nativo oculta el contenido de golpe, así que la animación solo es posible
+   retrasando el cierre: el script añade `is-closing`, mantiene `open` y
+   cierra al terminar. La cascada (0/40/80/120ms) más la duración (200ms)
+   suma 320ms: el timeout del script debe respetar ese total. */
+.menu-item {
+  transition:
+    transform 0.2s ease-in,
+    opacity 0.2s ease-in;
+}
+
+.is-closing .menu-panel {
+  pointer-events: none;
+}
+
+.is-closing .menu-item {
+  opacity: 0;
+  transform: translateX(1.5rem);
+}
+
+.is-closing .menu-item:nth-child(2) {
+  transition-delay: 40ms;
+}
+
+.is-closing .menu-item:nth-child(3) {
+  transition-delay: 80ms;
+}
+
+.is-closing .menu-item:nth-child(4) {
+  transition-delay: 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-panel {
+    animation: none;
+  }
+
+  .menu-item {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Nav desktop al redimensionar
+   Al reducir la ventana los enlaces se van deslizando hacia la derecha, y al
+   ampliar vuelven por el mismo camino. Las dos direcciones usan keyframes y
+   no transiciones: al cruzar el breakpoint el nav pasa por display:none, y
+   un elemento recién hecho visible no tiene valor previo contra el que
+   interpolar (las transiciones no se dispararían y todo saltaría de golpe).
+   Los keyframes sí se ejecutan al hacerse visible. Fuera de @layer, igual que
+   plate-mark: las clases se construyen en el componente y estas reglas tienen
+   que ganarle a `hidden` de Tailwind. La cascada (0/40/80/120ms) más la
+   duración (200ms) suma 320ms: los timeouts del script deben respetar ese
+   total.
+   --------------------------------------------------------------------------- */
+.nav-links.is-leaving {
+  /* Fuera del flujo mientras se van: en móvil el nav con ml-auto empujaría
+     los botones fuera de la pantalla. La posición inline (offset del header)
+     la fija el script antes de añadir la clase. */
+  display: flex;
+  position: absolute;
+}
+
+@keyframes nav-link-out {
+  to {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+/* `backwards`: cada enlace espera su turno de cascada en su sitio, visible,
+   antes de empezar a irse. `forwards` (fill both): al terminar se quedan
+   fuera, sin volver a aparecer los 20ms que median hasta que el script
+   oculta el nav completo. */
+.nav-links.is-leaving .nav-link {
+  animation: nav-link-out 0.2s ease-in both;
+}
+
+.nav-links.is-leaving .nav-link:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.nav-links.is-leaving .nav-link:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.nav-links.is-leaving .nav-link:nth-child(4) {
+  animation-delay: 120ms;
+}
+
+@keyframes nav-link-in {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+.nav-links.is-entering .nav-link {
+  animation: nav-link-in 0.2s ease-out backwards;
+}
+
+.nav-links.is-entering .nav-link:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.nav-links.is-entering .nav-link:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.nav-links.is-entering .nav-link:nth-child(4) {
+  animation-delay: 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-links.is-leaving .nav-link,
+  .nav-links.is-entering .nav-link {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Marcas de registro de las láminas
+   Continuaciones de 1px del marco por fuera de cada esquina; el trazado
+   reutiliza los keyframes de la rejilla del hero. Va fuera de @layer a
+   propósito: las clases se construyen en el componente (`plate-mark--${eje}`),
+   así que el purge de Tailwind no las reconoce y eliminaría reglas de
+   @layer components como si fueran código muerto.
+   --------------------------------------------------------------------------- */
+.plate-mark {
+  position: absolute;
+  display: block;
+  background-color: var(--hair);
+  pointer-events: none;
+}
+
+.plate-mark--x {
+  height: 1px;
+}
+
+.plate-mark--y {
+  width: 1px;
+}
+
+.plate-mark--x.from-left {
+  transform-origin: left;
+  --shift: -0.75rem;
+}
+
+.plate-mark--x.from-right {
+  transform-origin: right;
+  --shift: 0.75rem;
+}
+
+.plate-mark--y.from-top {
+  transform-origin: top;
+  --shift: -0.75rem;
+}
+
+.plate-mark--y.from-bottom {
+  transform-origin: bottom;
+  --shift: 0.75rem;
+}
+
+/* El trazado arranca cuando la lámina entra en pantalla, no al cargar. Solo
+   se activa con JS (`html.js` lo pone el script del <head>): sin JS estas
+   reglas no aplican y las marcas se ven ya dibujadas. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .plate-mark {
+    animation-duration: var(--dur);
+    animation-delay: var(--d);
+    animation-timing-function: cubic-bezier(0.45, 0.05, 0.25, 1);
+    animation-fill-mode: both;
+    animation-play-state: paused;
+  }
+
+  .js .plate-drawn .plate-mark {
+    animation-play-state: running;
+  }
+
+  .js .plate-mark--x {
+    animation-name: line-grow-x;
+  }
+
+  .js .plate-mark--y {
+    animation-name: line-grow-y;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Cambio de tema paulatino
+   Las variables CSS no se transicionan por sí solas: al alternar .dark cambian
+   todos los colores de golpe. Aquí se abre una ventana breve con una
+   transición sobre las propiedades que dependen del tema, y el script la quita
+   cuando la ha durado.
+
+   Van fuera de cualquier @layer a propósito: las utilidades de Tailwind viven
+   en @layer utilities y ganarían en cascada aunque la especificidad de aquí
+   sea mayor.
+
+   La duración tiene que coincidir con el temporizador del script, que la
+   cierra un poco después.
+--------------------------------------------------------------------------- */
+html.theme-changing,
+html.theme-changing *,
+html.theme-changing *::before,
+html.theme-changing *::after {
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    fill 0.35s ease,
+    stroke 0.35s ease,
+    outline-color 0.35s ease;
+}
+
+/* Quien pide movimiento mínimo tampoco quiere animar el tema. */
+@media (prefers-reduced-motion: reduce) {
+  html.theme-changing,
+  html.theme-changing *,
+  html.theme-changing *::before,
+  html.theme-changing *::after {
+    transition: none;
+  }
+}

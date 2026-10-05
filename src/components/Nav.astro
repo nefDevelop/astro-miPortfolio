@@ -1,0 +1,1146 @@
+---
+import { ui, type Locale } from '../i18n/translations';
+import { personalInfo } from '../data/portfolio';
+import { localePath } from '../lib/paths';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+
+// El enlace de idioma mantiene la ruta actual: cambiar de /es/projects/x/ a
+// /en/projects/x/ en lugar de tirar al usuario a la portada. Funciona porque
+// el segmento de URL de un caso ya no lleva el idioma dentro.
+const segments = Astro.url.pathname.replace(/^\/+|\/+$/g, '').split('/');
+const known = Object.keys(ui) as string[];
+const resto = known.includes(segments[0]) ? segments.slice(1) : segments;
+// El sitio solo tiene dos rutas: la portada y projects/<slug>. Si la ruta
+// actual no empieza por ninguna no hay counterparts que preservar. Pasa en la
+// 404, que el servidor sirve para cualquier URL: sin esta guarda, cambiar de
+// idioma ahi producia /en/404/, que no existe.
+const RAICES = new Set(['', 'projects']);
+const path = RAICES.has(resto[0] ?? '') ? resto.join('/') : '';
+const otherLang: Locale = lang === 'es' ? 'en' : 'es';
+const href = (locale: Locale) => localePath(locale, path);
+
+// Los anchors llevan la ruta de la home para que también funcionen desde las
+// páginas de caso de estudio, donde esas secciones no existen.
+// En el mismo orden en que Home renderiza las secciones. Antes estaba
+// Proyectos detrás de Trayectoria, y como los enlaces saltan por anclas, un
+// clic en "Proyectos" saltaba hacia atrás respecto a la lista del menú.
+const links = [
+	{ id: 'proyectos', label: t.nav.projects },
+	{ id: 'sobre-mi', label: t.nav.about },
+	{ id: 'trayectoria', label: t.nav.background },
+	{ id: 'contacto', label: t.nav.contact },
+].map((link) => ({ ...link, href: `/${lang}/#${link.id}` }));
+// Una casilla por carácter del texto más largo que puede aparecer en el
+// header. Todas las etiquetas caben en ese ancho, y las casillas de más quedan
+// vacías: cada casilla es una letra física que se mueve a la posición que le
+// toca en el texto nuevo, en vez de que el texto se sustituya entero.
+const LABEL_SLOTS = 32;
+const initialChars = [...personalInfo.fullName];
+// El script empareja por dataset.char y decide qué casillas se van por el mismo
+// campo, así que el markup de servidor tiene que traerlo. Sin data-char el
+// primer morph no encuentra ni una coincidencia: las 17 letras del nombre se
+// sustituyen de golpe y ninguna viaja. Se emite solo en las casillas con letra,
+// para que las vacías sigan siendo undefined y no emparden con un espacio.
+//
+// Ojo: este comentario va aquí y no junto al <span>, porque en el children de
+// un elemento Astro trata `//` como texto y lo pinta en la página.
+---
+
+<header class="site-header sticky top-0 z-40">
+	<div class="mx-auto flex max-w-5xl items-center gap-4 px-5 py-3.5">
+		{/* El nombre visible se transforma al hacer scroll, pero el enlace siempre
+		    anuncia lo mismo: el texto del header es decorativo. */}
+		<a
+			href={`/${lang}/`}
+			aria-label={t.nav.label.home}
+			class="shrink-0 rounded-sm font-semibold tracking-tight transition-colors hover:text-muted focus-visible:text-muted"
+		>
+			<span id="nav-label" data-nombre={personalInfo.fullName} aria-hidden="true">{Array.from({ length: LABEL_SLOTS }).map((_, i) => <span class="nav-slot" data-char={i < initialChars.length ? initialChars[i] : undefined}>{i < initialChars.length ? initialChars[i] : ''}</span>)}</span>
+		</a>
+
+		<nav aria-label={t.nav.menu} class="nav-links ml-auto hidden items-center gap-6 md:flex">
+			{
+				links.map((link) => (
+					<a href={link.href} class="nav-link text-sm text-muted transition-colors hover:text-ink focus-visible:text-ink">
+						{link.label}
+					</a>
+				))
+			}
+		</nav>
+
+		<div class="ml-auto flex items-center gap-2 md:ml-0">
+			<button
+				type="button"
+				data-theme-toggle
+				aria-label={t.nav.theme}
+				title={t.nav.theme}
+				aria-pressed="false"
+				class="grid h-9 w-9 place-items-center rounded-full border border-hair text-ink wash"
+			>
+				<svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+					<circle cx="12" cy="12" r="4"></circle>
+					<path stroke-linecap="round" d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"></path>
+				</svg>
+				<svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"></path>
+				</svg>
+			</button>
+
+			<a
+				href={href(otherLang)}
+				lang={otherLang}
+				hreflang={otherLang}
+				aria-label={t.nav.switchLang[otherLang]}
+				class="rounded-full border border-hair px-3 py-1.5 font-mono text-xs uppercase tracking-widest wash"
+			>
+				{otherLang}
+			</a>
+
+			<details class="group relative md:hidden" data-menu>
+				<summary
+					class="grid h-9 w-9 cursor-pointer list-none place-items-center rounded-full border border-hair wash [&::-webkit-details-marker]:hidden"
+					aria-label={t.nav.menu}
+				>
+				{/* Tres barras que se cruzan en X al abrir. El menú es un
+				    <details> nativo, así que la transición no necesita JS:
+				    solo las variantes group-open: y un transition en cada
+				    barra. Sin JS (o con reduced-motion) las barras se quedan
+				    en su estado final. */}
+				<span class="relative block h-4 w-4" aria-hidden="true">
+					<span
+						class="absolute inset-x-0 top-0 h-0.5 rounded-full bg-current transition-all duration-300 ease-out group-open:translate-y-[7px] group-open:rotate-45 motion-reduce:transition-none"
+					></span>
+					<span
+						class="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 rounded-full bg-current transition-all duration-300 ease-out group-open:scale-x-0 group-open:opacity-0 motion-reduce:transition-none"
+					></span>
+					<span
+						class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-current transition-all duration-300 ease-out group-open:-translate-y-[7px] group-open:-rotate-45 motion-reduce:transition-none"
+					></span>
+				</span>
+				</summary>
+				<div class="menu-panel absolute right-0 top-11 w-48 border border-hair bg-paper py-2 shadow-lg">
+					{
+						links.map((link) => (
+							<a
+								href={link.href}
+								class="menu-item block px-4 py-2 text-sm text-muted transition-colors hover:text-ink focus-visible:text-ink"
+							>
+								{link.label}
+							</a>
+						))
+					}
+				</div>
+			</details>
+		</div>
+	</div>
+</header>
+
+<script>
+	// El menú móvil es un <details> nativo, que no cierra solo: hay que hacerlo
+	// con Escape, al pulsar fuera y al elegir una opción. Sin esto se quedaba
+	// abierto encima del contenido.
+	//
+	// El cierre es animado (los enlaces se deslizan hacia fuera con cascada),
+	// pero el <details> oculta el contenido de golpe: la salida se retrasa con
+	// la clase `is-closing` y el panel se cierra cuando termina. El total de
+	// la cascada en CSS es 320ms; el timeout deja 20ms de margen.
+	const SALIDA_MS = 340;
+
+	document.querySelectorAll<HTMLDetailsElement>('[data-menu]').forEach((menu) => {
+		let cerrando = 0; // id del timeout de la salida, 0 si no hay ninguna en curso
+
+		const cerrar = (inmediato = false) => {
+			if (!menu.open) return;
+			if (inmediato || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+				window.clearTimeout(cerrando);
+				cerrando = 0;
+				menu.classList.remove('is-closing');
+				menu.open = false;
+				return;
+			}
+			if (cerrando) return; // la salida ya está en marcha
+			menu.classList.add('is-closing');
+			cerrando = window.setTimeout(() => {
+				menu.classList.remove('is-closing');
+				menu.open = false;
+				cerrando = 0;
+			}, SALIDA_MS);
+		};
+
+		// Si se vuelve a abrir a mano mientras la salida estaba en curso, se
+		// cancela: sin esto el timeout pondría open=false en cuanto reabriera.
+		menu.addEventListener('toggle', () => {
+			if (menu.open && cerrando) {
+				window.clearTimeout(cerrando);
+				cerrando = 0;
+				menu.classList.remove('is-closing');
+			}
+		});
+
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') cerrar();
+		});
+
+		document.addEventListener('click', (event) => {
+			if (menu.open && !menu.contains(event.target as Node)) cerrar();
+		});
+
+		// Al navegar dentro de la misma página (los enlaces son anclas) el
+		// <details> se cerraría solo al perder el foco, pero no de forma fiable
+		// en todos los navegadores.
+		menu.addEventListener('click', (event) => {
+			if ((event.target as HTMLElement).closest('a')) cerrar();
+		});
+
+		// Al volver a desktop el panel se queda abierto y flotando en el aire.
+		// Ahí el menú está oculto (md:hidden), así que no compensa animar.
+		window.matchMedia('(min-width: 768px)').addEventListener('change', (event) => {
+			if (event.matches) cerrar(true);
+		});
+	});
+
+	// Los enlaces del nav desktop no pueden desaparecer de golpe al reducir la
+	// ventana: `hidden` de Tailwind los oculta en cuanto se cruza el breakpoint.
+	// Con `is-leaving` el nav sigue visible (y fuera del flujo, para no empujar
+	// los botones fuera de pantalla en móvil) mientras los enlaces se van
+	// deslizando; con `is-entering` vuelven con keyframes, porque las
+	// transiciones no se disparan al pasar de display:none a visible.
+	// La cascada en CSS suma 320ms; el timeout deja 20ms de margen.
+	const NAV_SALIDA_MS = 340;
+
+	const navDesktop = document.querySelector<HTMLElement>('.nav-links');
+	let navAnim = 0; // id del timeout en curso, 0 si no hay ninguno
+
+	// La posición del nav en desktop se guarda mientras sigue visible: cuando
+	// corre el listener de cambio, `hidden` ya se aplicó y offsetLeft
+	// devolvería 0, dejando la animación en la esquina del header.
+	const posNav = { left: 0, top: 0 };
+	const medirNav = () => {
+		if (!navDesktop || !matchMedia('(min-width: 768px)').matches) return;
+		posNav.left = navDesktop.offsetLeft;
+		posNav.top = navDesktop.offsetTop;
+	};
+	medirNav();
+	window.addEventListener('resize', medirNav);
+	// La posición depende del ancho de los enlaces, que cambia cuando carga la
+	// fuente: se vuelve a medir con la página fully cargada.
+	window.addEventListener('load', medirNav);
+
+	const cancelarNavAnim = () => {
+		window.clearTimeout(navAnim);
+		navAnim = 0;
+		if (navDesktop) {
+			navDesktop.classList.remove('is-leaving', 'is-entering');
+			navDesktop.style.left = '';
+			navDesktop.style.top = '';
+		}
+	};
+
+	const salirNav = () => {
+		if (!navDesktop || navAnim) return;
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		navDesktop.style.left = `${posNav.left}px`;
+		navDesktop.style.top = `${posNav.top}px`;
+		navDesktop.classList.add('is-leaving');
+		navAnim = window.setTimeout(() => {
+			navDesktop.classList.remove('is-leaving');
+			navDesktop.style.left = '';
+			navDesktop.style.top = '';
+			navAnim = 0;
+		}, NAV_SALIDA_MS);
+	};
+
+	const entrarNav = () => {
+		if (!navDesktop || navAnim) return;
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		navDesktop.classList.add('is-entering');
+		navAnim = window.setTimeout(() => {
+			navDesktop.classList.remove('is-entering');
+			navAnim = 0;
+		}, NAV_SALIDA_MS);
+	};
+
+	window.matchMedia('(min-width: 768px)').addEventListener('change', (event) => {
+		// Una animación a medias de la dirección contraria se cancela: sin
+		// esto, el timeout de la salida dejaría los enlaces invisibles en
+		// desktop hasta que expirara.
+		cancelarNavAnim();
+		if (event.matches) {
+			medirNav();
+			entrarNav();
+		} else {
+			salirNav();
+		}
+	});
+
+	// El estado del tema solo se veía en la clase del <html>. Un lector de
+	// pantalla no puede anunciarlo, asi que el boton lo declara con
+	// aria-pressed y se sincroniza al arrancar y en cada cambio.
+	const botonTema = document.querySelector('[data-theme-toggle]');
+	const reflejarTema = () => {
+		if (botonTema) botonTema.setAttribute('aria-pressed', String(document.documentElement.classList.contains('dark')));
+	};
+	reflejarTema();
+
+	// El favicon tampoco hereda el tema: es un documento aislado. Las dos
+	// variantes viajan en los data-attributes del <link> (las monta el
+	// Layout) y aqui se recrea el enlace con la que toca. El nodo se
+	// recrea y no se muta su href porque Chrome no vuelve a pintar el icono
+	// de la pestaña al cambiar la href de un <link> ya cargado; ademas se
+	// añade un cache-buster, porque el servicio de favicons de Chrome
+	// cachea por URL y a veces ignora el cambio aunque el nodo sea nuevo.
+	const reflejarFavicon = () => {
+		const viejo = document.querySelector<HTMLLinkElement>('link[data-icon-light]');
+		if (!viejo?.dataset.iconLight || !viejo.dataset.iconDark) return;
+		const base = document.documentElement.classList.contains('dark')
+			? viejo.dataset.iconDark
+			: viejo.dataset.iconLight;
+		const nuevo = document.createElement('link');
+		nuevo.rel = 'icon';
+		nuevo.type = 'image/svg+xml';
+		nuevo.href = `${base}?v=${Date.now()}`;
+		nuevo.dataset.iconLight = viejo.dataset.iconLight;
+		nuevo.dataset.iconDark = viejo.dataset.iconDark;
+		viejo.replaceWith(nuevo);
+	};
+	reflejarFavicon();
+
+	// El cambio de tema no puede saltar de golpe. Las variables CSS no se
+	// transicionan por sí solas, así que se abre una ventana en la que el CSS
+	// aplica la transición a todas las propiedades de color, y se cierra
+	// cuando la ha durado. Solo durante el cambio: si se dejara puesta, todos
+	// los hovers pasarían a 350 ms de un golpe.
+	//
+	// No se toca en el script de la <head>, que pone el tema inicial antes del
+	// primer pintado: ahí un arranque de página no debe animarse.
+	const CAMBIO_TEMA = 400;
+	let cambioTema = 0;
+	const suavizarTema = () => {
+		const raiz = document.documentElement;
+		raiz.classList.add('theme-changing');
+		window.clearTimeout(cambioTema);
+		cambioTema = window.setTimeout(() => raiz.classList.remove('theme-changing'), CAMBIO_TEMA);
+	};
+
+	// Mientras el visitante no elija nada, el tema sigue al del sistema. En
+	// cuanto toca el boton su eleccion manda y deja de moverse solo.
+	const sistema = window.matchMedia('(prefers-color-scheme: dark)');
+	sistema.addEventListener('change', (event) => {
+		if (localStorage.getItem('theme')) return;
+		suavizarTema();
+		document.documentElement.classList.toggle('dark', event.matches);
+		reflejarTema();
+		reflejarFavicon();
+	});
+
+	document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+		button.addEventListener('click', () => {
+			// Antes de alternar: si se añade después, el navegador ya no tiene
+			// la transición en el estilo de salida y el cambio sigue siendo
+			// instantáneo.
+			suavizarTema();
+			const isDark = document.documentElement.classList.toggle('dark');
+			localStorage.setItem('theme', isDark ? 'dark' : 'light');
+			button.setAttribute('aria-pressed', String(isDark));
+			reflejarFavicon();
+		});
+	});
+
+	// Etiqueta del header según la sección por la que se va pasando. Cada
+	// elemento marcado con data-nav-label toma el control cuando cruza la banda
+	// central del viewport.
+	const label = document.getElementById('nav-label');
+	const link = label?.parentElement;
+
+	if (label) {
+		const slots = Array.from(label.querySelectorAll<HTMLElement>('.nav-slot'));
+		const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+		// Cada letra se mueve con su propia curva y su propio ritmo: unas salen
+		// antes, otras se quedan detrás, y las que nacen se pasan de su posición
+		// y vuelven. Nada comparte easing, que es lo que hace que un bloque de
+		// letras parezca un solo objeto rigido.
+		const SPARE = 26;
+		const TRAVEL = 780;
+		const POP = 460;
+		const DRAG = 520;
+		// Retardo por posición de la letra, en ms. 5ms por carácter deja que la onda
+		// cruce las 31 letras del rol en ~155ms: perceptible sin alargar la tanda.
+		const WAVE = 5;
+		// Las que se van comparten el mismo peldaño, para que la palabra se lea
+		// como un solo gesto que entra y sale con la misma cadencia.
+		const WAVE_OUT = 5;
+		// Duración del desvanecido de las que se van. Va en el bucle de rAF, no en
+		// una transición CSS: así comparte reloj con el reacomodo y las dos cosas
+		// ocurren a la vez. 420ms es algo más de la mitad de TRAVEL, para que la
+		// última de 21 letras se vaya en 100 + 420 = 520ms, con el reacomodo aún
+		// en curso. Antes, con 240ms de transición CSS, todo se apagaba en 365ms y
+		// el morph se leía en dos fases separadas en vez de como un gesto.
+		const OUT_DUR = 420;
+		// Duración SOLO del desplazamiento, distinta de la del desvanecido.
+		// Compartir un solo número era el problema: la letra necesitaba ~250 ms
+		// para salir de la palabra nueva, mientras los que nacían aparecían desde
+		// el primer frame. El resultado medido eran 26 pares a opacidad 1.00 a
+		// los 100 ms.
+		//
+		// Con dos tiempos, salir toma 160 ms y disolverse sigue tomando los 420:
+		// el sitio se libera pronto y la letra no desaparece de golpe.
+		const OUT_MOV = 160;
+		// Curva del movimiento de salida: sale de la zona de inmediato y se
+		// asienta al final. El movimiento iba lineal y eso era el problema medido:
+		// a los 100 ms las letras que sobraban llevaban recorrido el 24% de su
+		// trayectoria y estaban al 85% de opacidad, así que durante unos 200 ms se
+		// veían veintiún letras a opacidad 1.00 encima de la palabra nueva.
+		//
+		// Moverse pronto y apagarse despacio son dos cosas distintas: el fallo
+		// estaba en meterlas en una sola curva.
+		const curvaSalida = (p: number) => 1 - (1 - p) ** 3;
+		const OUT_SHRINK = 0.92;
+		// Cuánto se aleja una letra que ya queda fuera de la palabra nueva.
+		const OUT_EXIT = 18;
+		// Holgura para que una letra que estaba dentro salga por el borde y no
+		// llegue a montarse sobre la primera letra de la nueva.
+		const OUT_CLEAR = 10;
+		// Separación entre las que salen del interior. Sin esto se apilan todas en
+		// el mismo punto y el desvanecido se ve como una mancha.
+		const OUT_SPREAD = 11;
+
+		// Cómo se van las sobrantes. 'fuera' las retira hacia el borde de la palabra
+		// nueva para que no se lean dos palabras superpuestas; 'sitio' solo las
+		// desvanece, que es un gesto más simple pero deja la palabra vieja encima
+		// de la nueva mientras dura el solape.
+		//
+		// Se puede cambiar por ?salida=fuera|sitio en desarrollo, para comparar las
+		// dos en el navegador sin reconstruir. En producción el parámetro se ignora
+		// y manda el valor de aquí.
+		const EXIT_MODE: 'fuera' | 'sitio' =
+			import.meta.env.DEV &&
+			new URLSearchParams(window.location.search).get('salida') === 'sitio'
+				? 'sitio'
+				: 'fuera';
+
+		// Punto de llegada de una letra que se va. Función pura a propósito: toda
+		// la geometría de la salida se puede comprobar en un test sin navegador.
+		//
+		// Se pide el peldaño de cada letra para que dos de dentro nunca terminen en
+		// la misma x. Sin eso, al pasar del rol a RecipeNode cinco letras
+		// aterrizaban en el mismo punto y se veían superpuestas durante todo el
+		// desvanecido.
+		const calcularSalida = (x: number, ancho: number, peldano: number) => {
+			if (EXIT_MODE === 'sitio') return { desde: x, hasta: x };
+
+			const dentro = x >= 0 && x <= ancho;
+			if (!dentro) return { desde: x, hasta: x + (x < ancho / 2 ? -OUT_EXIT : OUT_EXIT) };
+
+			// Dentro de la palabra nueva hay que salir por el borde, y cada una por
+			// el suyo: el peldaño las separa para que no se amontonen.
+			const holgura = OUT_CLEAR + peldano * OUT_SPREAD;
+			const hasta = x < ancho / 2 ? -holgura : ancho + holgura;
+			return { desde: x, hasta };
+		};
+
+		// Curva del desvanecido: smoothstep invertido. La letra se sostiene visible
+		// al principio y se suelta al final. Con ease-out, que es lo que usaba la
+		// transición CSS, el 80% del desvanecido pasaba en el primer tercio y se
+		// leía como un parpadeo.
+		const desvanecer = (p: number) => 1 - p * p * (3 - 2 * p);
+
+		let origin = slots.map(() => ({ x: 0, y: 0 }));
+		let current = label.textContent ?? '';
+		let busy = false;
+		let queued = '';
+
+		const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
+
+		// Escala del pop de las letras recién nacidas. Dos tramos: sube hasta
+		// PEAK y vuelve con guía de seno hasta 1 exacto, para que el cierre sea
+		// continuo y no haya salto al asentar.
+		const POP_PEAK = 0.42;
+		const POP_MAX = 1.13;
+		const popScale = (p: number) => {
+			const v = clamp01(p);
+			if (v <= POP_PEAK) return 0.78 + (POP_MAX - 0.78) * (v / POP_PEAK);
+			const u = (v - POP_PEAK) / (1 - POP_PEAK);
+			return POP_MAX + (1 - POP_MAX) * Math.sin(u * Math.PI * 0.5);
+		};
+
+		// Solucion de una cubic-bezier(x1,y1,x2,y2). Se usa Newton-Raphson con
+		// vuelta a bisección, que es el método de CSS.
+		const bezier = (x1: number, y1: number, x2: number, y2: number) => {
+			const A = (a: number, b: number) => 1 - 3 * b + 3 * a;
+			const B = (a: number, b: number) => 3 * b - 6 * a;
+			const C = (a: number) => 3 * a;
+			const value = (t: number, a: number, b: number) => ((A(a, b) * t + B(a, b)) * t + C(a)) * t;
+			const slope = (t: number, a: number, b: number) => 3 * A(a, b) * t * t + 2 * B(a, b) * t + C(a);
+
+			return (x: number) => {
+				if (x <= 0) return 0;
+				if (x >= 1) return 1;
+				let t = x;
+				for (let i = 0; i < 8; i++) {
+					const d = slope(t, x1, x2);
+					if (Math.abs(d) < 1e-6) break;
+					const err = value(t, x1, x2) - x;
+					if (Math.abs(err) < 1e-6) break;
+					t -= err / d;
+				}
+				return value(t, y1, y2);
+			};
+		};
+
+		// Medidor oculto: monta el texto destino en flujo normal y devuelve la
+		// posición de cada carácter. En una fuente proporcional no se puede
+		// deducir la posición de una letra sin maquetarla.
+		const ruler = document.createElement('span');
+		ruler.setAttribute('aria-hidden', 'true');
+		ruler.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0;';
+		label.appendChild(ruler);
+
+		const measure = (text: string) => {
+			ruler.textContent = '';
+			const spans = [...text].map((char) => {
+				const span = document.createElement('span');
+				// El espacio se colapsa dentro de un inline-block: nbsp mide el
+				// avance real.
+				span.style.cssText = 'display:inline-block;white-space:pre';
+				span.textContent = char === ' ' ? '\u00a0' : char;
+				ruler.appendChild(span);
+				return span;
+			});
+			const box = ruler.getBoundingClientRect();
+			const spots = spans.map((span) => {
+				const rect = span.getBoundingClientRect();
+				return { x: rect.left - box.left, y: rect.top - box.top };
+			});
+			ruler.textContent = '';
+			return { spots, width: box.width };
+		};
+
+		// Primera medición: las casillas aún están en flujo normal, así que su
+		// posición real es la que se ve en pantalla.
+		const initialBox = label.getBoundingClientRect();
+		origin = slots.map((slot) => {
+			const rect = slot.getBoundingClientRect();
+			return { x: rect.left - initialBox.left, y: rect.top - initialBox.top };
+		});
+		slots.forEach((slot, i) => {
+			slot.dataset.char = slot.textContent ?? '';
+			slot.style.left = `${origin[i].x}px`;
+			slot.style.top = `${origin[i].y}px`;
+		});
+		label.classList.add('is-morph');
+		label.style.height = `${initialBox.height}px`;
+		label.style.width = `${initialBox.width + SPARE}px`;
+
+		const morph = (next: string) => {
+			const text = [...next].slice(0, slots.length).join('');
+			if (!text || text === current) return;
+			// Si llega otro cambio en pleno vuelo se memoriza el último: las
+			// posiciones de origen ya no serían válidas.
+			if (busy) {
+				queued = text;
+				return;
+			}
+			busy = true;
+			current = text;
+			if (link) link.setAttribute('title', text);
+
+			const chars = [...text];
+			const taken = new Set<number>();
+			const assign: number[] = new Array(chars.length).fill(-1);
+
+			// Emparejar por carácter: cada letra nueva reutiliza la primera casilla
+			// libre que ya tuviera ese mismo glifo. Por eso la D de "Domínguez" es
+			// la que se convierte en la D de "Desarrollador".
+			chars.forEach((char, j) => {
+				for (let i = 0; i < slots.length && assign[j] === -1; i++) {
+					if (!taken.has(i) && slots[i].dataset.char === char) {
+						assign[j] = i;
+						taken.add(i);
+					}
+				}
+			});
+
+			// Las que nacen ocupan casillas que se quedan sin destino.
+			const spare = slots.map((_, i) => i).filter((i) => !taken.has(i));
+			let nextSpare = 0;
+			const newborn: number[] = [];
+
+			chars.forEach((char, j) => {
+				if (assign[j] !== -1) return;
+				const slot = spare[nextSpare++];
+				if (slot === undefined) return;
+				assign[j] = slot;
+				newborn.push(slot);
+				slots[slot].dataset.char = char;
+				slots[slot].textContent = char;
+			});
+
+			// Las que se van se quedan donde están y se desvanecen; su vecindario se
+			// queda enganchado un momento, como si pesara.
+			const alive = new Set(assign);
+			const leaving = slots
+				.map((slot, i) => ({ slot, i }))
+				.filter(({ slot, i }) => !alive.has(i) && Boolean(slot.dataset.char));
+
+const target = measure(text);
+
+			// Las casillas se colocan con `left` absoluto, así que su orden en el
+			// DOM deja de coincidir con el orden visual en pantalla. Se reordenan
+			// para que textContent, la selección y el copiado lean la palabra en
+			// orden, y para que el ancho medido sea el del texto y no el del
+			// desorden.
+			const orden = [
+				...assign.filter((slotIndex) => slotIndex !== -1),
+				...slots.map((_, i) => i).filter((i) => !assign.includes(i)),
+			];
+			orden.forEach((slotIndex) => label.appendChild(slots[slotIndex]));
+
+			// Holgura a la derecha: durante el viaje las recién nacidas se pasan de su
+			// sitio y las que se pegan con peso se salen por la izquierda, así que la caja
+			// necesita margen para que `overflow: hidden` no las recorte.
+			// El ancho va con la holgura dentro de la caja y no con un margen
+			// negativo: si el margen estira al padre, este mide mal y el texto
+			// acaba recortado.
+			label.style.width = `${target.width + SPARE}px`;
+
+			type Mover = {
+				slot: number;
+				y: number;
+				from: number;
+				to: number;
+				delay: number;
+				dur: number;
+				ease: (p: number) => number;
+				fresh: boolean;
+				scale: (p: number) => number;
+				// Estado por frame. Permite que una letra ya asentada no vuelva a
+				// evaluarse ni a reescribirse: es lo que mantiene el coste acotado
+				// cuando la tanda se alarga.
+				settled: boolean;
+				scaleNow: number;
+				transformDone: boolean;
+				opacityDone: boolean;
+				lastDx: number;
+				lastScale: number;
+			};
+
+			// Las que se van. No llevan curva de posición: se desplazan en línea
+			// recta hacia su punto de salida y se desvanecen con smoothstep. Se
+			// guardan aparte de los movers porque no participan del pop ni del
+			// arrastre por peso: eso solo tiene sentido entre las que se quedan.
+			type Exiter = {
+				slot: number;
+				desde: number;
+				hasta: number;
+				delay: number;
+				dur: number;
+				hecho: boolean;
+			};
+
+			const movers: Mover[] = [];
+			// Las que se van. Se rellenan más abajo, cuando ya se sabe qué
+			// casillas quedan sin destino y cuál es el ancho de la palabra nueva.
+			let exiters: Exiter[] = [];
+			assign.forEach((slotIndex, j) => {
+				if (slotIndex === -1) return;
+				const spot = target.spots[j];
+				const fresh = newborn.includes(slotIndex);
+				const slot = slots[slotIndex];
+				// El script escribe transform y opacidad cada frame: cualquier
+				// transición CSS aquí pelearía con el viaje.
+				slot.style.transition = 'none';
+
+				// Las recién nacidas empiezan unos píxeles antes de su sitio y su curva
+				// se pasa de la posición: ese exceso es el pop, y es lo que empuja a
+				// las letras de al lado.
+				const from = fresh ? spot.x - 18 : origin[slotIndex].x;
+				const r = () => Math.random();
+				// Escalón de retardo por posición: la onda recorre la palabra de
+				// izquierda a derecha. Es pequeño a propósito, solo insinúa la
+				// dirección; el jitter aleatorio de cada letra es lo que evita que
+				// la onda se lea mecánica. Sin esto, j solo elige qué casilla ocupa
+				// cada letra y todas salen a la vez.
+				const wave = j * WAVE;
+
+				movers.push({
+					slot: slotIndex,
+					y: spot.y,
+					from,
+					to: spot.x,
+					delay: wave + (fresh ? r() * 120 : r() * 180),
+					dur: TRAVEL * (fresh ? 0.62 + r() * 0.3 : 0.72 + r() * 0.45),
+					ease: fresh
+						? bezier(0.18, 1.55, 0.4, 1)
+						: bezier(0.2 + r() * 0.45, 0.08 + r() * 0.35, 0.18 + r() * 0.35, 1),
+					fresh,
+					// Pop: sale al 0.78, se pasa hasta 1.13 y aterriza en 1 exacto.
+					// Importa el final exacto: si la curva acaba en otro valor,
+					// settle() lo impone de golpe y la letra da un tirón al
+					// encogerse o estirarse de golpe.
+					scale: fresh ? popScale : () => 1,
+					settled: false,
+					scaleNow: 1,
+					transformDone: false,
+					opacityDone: false,
+					lastDx: Number.NaN,
+					lastScale: Number.NaN,
+				});
+
+				// Cada letra se coloca ya en su posición final: a partir de aquí solo
+				// se mueve con transform, sin reflow.
+				slot.style.left = `${spot.x}px`;
+				slot.style.top = `${spot.y}px`;
+				slot.style.transform = 'translate3d(0px, 0px, 0)';
+				slot.style.opacity = fresh ? '0' : '1';
+			});
+
+			// Vecindario de cada letra que se va: la más cercana en el reparto
+			// anterior es la que se queda pegada con peso. Una misma letra no
+			// puede ser vecina de dos que se van a la vez, o el arrastre se
+			// sumaría y dejaría de leerse como un solo gesto.
+			const claimed = new Set<number>();
+			const mourners = leaving.map(({ i }) => {
+				let best = -1;
+				let bestDist = Infinity;
+				for (const mover of movers) {
+					if (claimed.has(mover.slot)) continue;
+					const d = Math.abs(origin[mover.slot].x - origin[i].x);
+					if (d < bestDist) {
+						bestDist = d;
+						best = mover.slot;
+					}
+				}
+				if (best >= 0) claimed.add(best);
+				return { mourner: best, goneFrom: origin[i].x };
+			});
+
+			// Las que se van se desvanecen en el MISMO bucle que las demás, no en
+			// una transición CSS aparte. Con dos motores distintos la palabra se
+			// leía en dos fases: primero se apagaba lo que sobraba (240ms) y luego,
+			// aparte, se recomponía el resto (hasta ~1050ms). Compartiendo reloj, las
+			// dos cosas pasan a la vez y se leen como un gesto.
+			//
+			// Ninguna baja de la línea: antes caían 5px mientras aún se leían, y eso
+			// decia claramente que se apartaban de la base.
+			//
+			// El orden sale de la x actual y no del índice del DOM: las casillas se
+			// reordenaron para que textContent lea la palabra, así que el índice ya
+			// no es la posición en pantalla.
+			const enOrden = [...leaving].sort((a, b) => origin[a.i].x - origin[b.i].x);
+
+			// Peldaño de cada una de las que están dentro de la palabra nueva, para
+			// que dos de ellas no caigan en el mismo sitio de destino.
+			let dentro = 0;
+			const escalon = new Map<number, number>();
+			enOrden.forEach(({ i }) => {
+				const x = origin[i].x;
+				if (x < 0 || x > target.width) return;
+				escalon.set(i, dentro);
+				dentro++;
+			});
+
+			exiters = [];
+			enOrden.forEach(({ slot, i }, rank) => {
+				slot.dataset.char = '';
+				// El script escribe transform y opacidad cada frame. Sin esto la
+				// transición de .nav-slot intentaría interpolar cada cambio y las
+				// letras irían con retraso.
+				slot.style.transition = 'none';
+
+				const x = origin[i].x;
+				const { desde, hasta } = calcularSalida(x, target.width, escalon.get(i) ?? 0);
+
+				exiters.push({
+					slot: slots.indexOf(slot),
+					desde,
+					hasta,
+					delay: rank * WAVE_OUT,
+					dur: OUT_DUR,
+					hecho: false,
+				});
+
+				// La casilla se vacía a su tiempo para que textContent no lea
+				// letras fantasma, pero solo si no se ha reutilizado.
+				setTimeout(() => {
+					if (!slot.dataset.char) slot.textContent = '';
+				}, Math.max(TRAVEL, OUT_DUR));
+			});
+
+			// El temporizador de arranque depende de document.fonts: si se dispara
+			// antes de que Onest esté lista, las posiciones del medidor son de la
+			// fuente de reserva y cada letra queda desplazada de forma distinta.
+			//
+			// Si la promesa no resolviera, el morph no llega a arrancar y las
+			// letras recién nacidas se quedan en opacidad 0 para siempre. Por eso
+			// también arranca si fonts.ready falla: peor una medición con la fuente
+			// de reserva que un header congelado.
+			const run = () => {
+				const start = performance.now();
+				// El total se calcula con los tiempos reales de esta tanda: si se
+				// supone un valor, las letras mas lentas siguen en vuelo cuando el
+				// bucle se cierra y settle() las teletransporta.
+				// Las que se van cuentan igual: si no, el bucle se cerraría con
+				// alguna todavía a medio desvanecer.
+				const total =
+					Math.max(
+						movers.reduce((max, mover) => Math.max(max, mover.delay + mover.dur), 0),
+						exiters.reduce((max, exiter) => Math.max(max, exiter.delay + exiter.dur), 0),
+					) + 40;
+				let frames = 0;
+
+				const settle = () => {
+					movers.forEach((mover) => {
+						const slot = slots[mover.slot];
+						slot.style.transition = '';
+						slot.style.transform = 'translate3d(0px, 0, 0)';
+						slot.style.opacity = '1';
+						origin[mover.slot] = { x: mover.to, y: mover.y };
+					});
+					// Las que se van quedan en su sitio, invisibles. No hace falta
+					// devolverlas a ninguna posicion: si las reutiliza un morph
+					// siguiente, ese morph las coloca por su cuenta.
+					exiters.forEach((exiter) => {
+						const slot = slots[exiter.slot];
+						slot.style.transition = '';
+						slot.style.transform = 'translate3d(0px, 0, 0)';
+						slot.style.opacity = '0';
+					});
+					frame = 0;
+					busy = false;
+					if (queued) {
+						const siguiente = queued;
+						queued = '';
+						morph(siguiente);
+					}
+				};
+
+				const paint = (now: number) => {
+					frames++;
+					const t = now - start;
+					const at = new Array(movers.length).fill(0);
+
+					// 1. Cada letra en su sitio, con su curva y su ritmo.
+					//
+					// Las que ya terminaron no se tocan: su posición y su escala son
+					// exactamente las finales, así que volver a escribirles el
+					// transform es trabajo tirado. Solo se evalúa la curva de las que
+					// están en vuelo, que es lo que baja el coste por frame.
+					for (let k = 0; k < movers.length; k++) {
+						const mover = movers[k];
+						// Una letra ya asentada conserva su posicion final. Sin esto, at[]
+						// arrancaria en 0 y saltaria al sitio contrario al acabar.
+						if (mover.settled) {
+							at[k] = mover.to;
+							continue;
+						}
+
+						const p = clamp01((t - mover.delay) / mover.dur);
+						if (p >= 1) {
+							mover.settled = true;
+							mover.scaleNow = 1;
+							at[k] = mover.to;
+							// Fuerza un unico escrito final exacto, ya sin curva que aplicar.
+							mover.transformDone = false;
+							continue;
+						}
+
+						mover.scaleNow = mover.scale(p);
+						at[k] = p <= 0 ? mover.from : mover.from + (mover.to - mover.from) * mover.ease(p);
+					}
+
+					// 2. Pop: el exceso de una recién nacida empuja a sus vecinas.
+					movers.forEach((mover, k) => {
+						if (!mover.fresh) return;
+						const p = clamp01((t - mover.delay) / mover.dur);
+						if (p <= 0 || p >= 1) return;
+						const shove = (at[k] - mover.to) * 0.55;
+						for (let n = k - 1; n <= k + 1; n += 2) {
+							if (n < 0 || n >= movers.length) continue;
+							at[n] += shove;
+						}
+					});
+
+					// 3. Peso: la vecina de una letra que se va sale con ella un momento.
+					mourners.forEach(({ mourner, goneFrom }) => {
+						if (mourner < 0) return;
+						const k = movers.findIndex((mover) => mover.slot === mourner);
+						if (k < 0) return;
+						at[k] += (goneFrom - movers[k].from) * 0.28 * (1 - clamp01(t / DRAG));
+					});
+
+					movers.forEach((mover, k) => {
+						// Fuera solo si ya esta escrita en su sitio final y su opacidad
+						// esta resuelta: no queda nada que escribirle.
+						if (mover.settled && mover.opacityDone && mover.transformDone) return;
+
+						const slot = slots[mover.slot];
+						const dx = at[k] - mover.to;
+						const scale = mover.scaleNow;
+
+						// No se reescribe el transform si no ha cambiado de sitio ni de
+						// escala: escribir 31 estilos idénticos cada frame es lo que
+						// dispara el coste real.
+						const quieta = mover.transformDone && dx === mover.lastDx && scale === mover.lastScale;
+						if (!quieta) {
+							slot.style.transform = `translate3d(${dx.toFixed(2)}px, 0, 0) scale(${scale.toFixed(3)})`;
+							mover.transformDone = true;
+							mover.lastDx = dx;
+							mover.lastScale = scale;
+						}
+
+						// Una recién nacida aparece mientras hace su pop. La opacidad se
+						// mide desde su propio retardo, no desde el inicio de la tanda: si
+						// no, una letra con retardo alto sale medio visible justo cuando
+						// empieza a moverse.
+						if (mover.fresh && !mover.opacityDone) {
+							const o = clamp01((t - mover.delay) / (POP * 0.5));
+							slot.style.opacity = String(o);
+							if (o >= 1) mover.opacityDone = true;
+						}
+					});
+
+					// 4. Las que se van, en el mismo reloj. Se desplazan en línea recta
+					// hacia su punto de salida y se desvanecen con smoothstep, sin
+					// bajar de la línea: se leen como letra que se marcha, no como
+					// letra que se cae.
+					for (let k = 0; k < exiters.length; k++) {
+						const exiter = exiters[k];
+						if (exiter.hecho) continue;
+
+						// Dos progresos con la misma llegada y ritmos distintos: el
+						// movimiento termina antes y el desvanecido después. `hecho`
+						// se decide por el más largo, que es la opacidad.
+						const t0 = t - exiter.delay;
+						const p = clamp01(t0 / exiter.dur);
+						if (p >= 1) {
+							exiter.hecho = true;
+							continue;
+						}
+						// Antes de arrancar no se toca nada: la letra sigue donde
+						// estaba, con su opacidad, hasta que le toca su turno.
+						if (t0 <= 0) continue;
+
+						const e = curvaSalida(clamp01(t0 / OUT_MOV));
+						const slot = slots[exiter.slot];
+						const avance = (exiter.hasta - exiter.desde) * e;
+						const escala = 1 - (1 - OUT_SHRINK) * e;
+						slot.style.transform = `translate3d(${avance.toFixed(2)}px, 0, 0) scale(${escala.toFixed(3)})`;
+						slot.style.opacity = String(desvanecer(p));
+					}
+
+					// El tope de frames es la red de seguridad: si el reloj o el
+					// rAF se congela, las letras se asientan igualmente en vez de
+					// quedarse a medio camino para siempre.
+					if (t < total && frames < 240) {
+						frame = requestAnimationFrame(paint);
+						return;
+					}
+					settle();
+				};
+
+				if (reduceMotion.matches) {
+					movers.forEach((mover) => {
+						const slot = slots[mover.slot];
+						slot.style.opacity = '1';
+						origin[mover.slot] = { x: mover.to, y: mover.y };
+					});
+					// Las que se van desaparecen de golpe: sin animación no hay a qué
+					// atenerse. Antes esto lo cubría la transición CSS, que además
+					// había que anular en línea porque su @media quedaba pisado.
+					exiters.forEach((exiter) => {
+						slots[exiter.slot].style.opacity = '0';
+					});
+					busy = false;
+					return;
+				}
+
+				frame = requestAnimationFrame(paint);
+			};
+
+			if (document.fonts?.status === 'loaded') run();
+			else document.fonts.ready.then(run, run);
+		};
+
+		let frame = 0;
+
+		const marked = Array.from(document.querySelectorAll('[data-nav-label]'));
+		if (marked.length > 0) {
+			// La línea del rol ya está en la banda central al abrir la página. Sin
+			// este mínimo de scroll, el header cambiaría solo al cargar y el nombre
+			// no se vería nunca.
+			const MIN_SCROLL = 200;
+			// Alto real de la cabecera. Lo usan dos cosas: hasta dónde tiene que
+			// subir una etiqueta para que el header la adopte, y hasta dónde se
+			// atenúa la copia de la página al acercarse. Medido una vez y otra vez
+			// en resize, porque el padding cambia con el ancho de pantalla.
+			const cabecera = document.querySelector('.site-header');
+			let altoBarra = cabecera?.offsetHeight ?? 64;
+
+			// Una etiqueta solo se adopta cuando la copia de la página ya casi ha
+			// desaparecido, es decir, cuando está pegada por debajo de la barra.
+			//
+			// Con la regla de "la más cercana al centro" se adoptaba a media
+			// pantalla, y entonces el header y la página decían lo mismo a la vez.
+			// Aquí el cambio coincide con el fundido: cuando la copia entra en la
+			// franja de atenuación y queda prácticamente invisible, la barra la
+			// recoge. Así no hay dos textos.
+			//
+			// Si no hay ninguna en esa franja, se mantiene la anterior; ver el
+			// bloque de "sin elegible" más abajo.
+			const PEGADA = 30;
+			// El nombre se saca de la etiqueta ya pintada por el servidor, no de
+			// `current` (que para entonces puede ser la sección de otra cosa) ni de
+			// los datos del frontmatter: los <script> de Astro son módulos
+			// aparte y no ven los imports de la cabecera.
+			const NOMBRE = label.dataset.nombre ?? '';
+
+			// De las que han llegado a la franja pegada a la barra se elige la más
+			// cercana al centro. Elegir solo por "más cercano al centro" a secas
+			// traía dos fallos: adoptaba un titular apenas asomado por abajo, y lo
+			// ponía en la barra mientras la copia seguía legible en la página.
+			//
+			// Antes había aquí una histéresis para romper empates entre dos etiquetas
+			// casi equidistantes. Ya no hace falta, y de hecho estorbaba: la franja
+			// de adopción mide ~130 px y las etiquetas están a 724-1271 px entre
+			// ellas, así que nunca caben dos a la vez. Al mantener la etiqueta
+			// anterior solo por estar en pantalla, bloqueaba cambios que sí
+			// correspondía hacer cuando uno volvía hacia arriba.
+			let scheduled = 0;
+
+			// Lee el rect una sola vez por elemento: dentro del bucle no se escribe
+			// nada hasta el final, pero repetir la lectura por cada métrica es
+			// el error clásico de este tipo de cálculo.
+			const leerRect = (el: HTMLElement) => el.getBoundingClientRect();
+
+			const actualizar = () => {
+				scheduled = 0;
+
+				// Arriba del todo manda el nombre. Antes solo se salía de aquí con un
+				// return, así que al volver a subir el header se quedaba congelado
+				// con la última sección por la que se pasó.
+				if (window.scrollY < MIN_SCROLL) {
+					morph(NOMBRE);
+					return;
+				}
+
+				const middle = window.innerHeight * 0.5;
+				let elegido: HTMLElement | null = null;
+				let mejor = Infinity;
+
+				for (const el of marked) {
+					const rect = leerRect(el);
+					if (rect.bottom < 0 || rect.top > window.innerHeight) continue;
+					if (rect.top > altoBarra + PEGADA) continue;
+					const d = Math.abs(rect.top + rect.height / 2 - middle);
+					if (d < mejor) {
+						mejor = d;
+						elegido = el;
+					}
+				}
+				if (!elegido) {
+					// Ninguna etiqueta merece aparecer todavía, o ya las hemos pasado
+					// todas. Aquí antes se hacía un simple return y el header se quedaba
+					// con lo que tuviera: si el usuario bajaba hasta que RecipeNode se
+					// hacía elegible y luego volvía hacia arriba, el header seguía
+					// diciendo RecipeNode con el hero otra vez en pantalla.
+					//
+					// Lo que se coge es la última etiqueta que ya se ha pasado por
+					// encima: es la sección que acaba de salir por arriba, que es
+					// justo donde se está. Si no ha pasado ninguna, no hay nada que
+					// corregir y se mantiene la actual.
+					let pasada: HTMLElement | null = null;
+					let masReciente = -Infinity;
+					for (const el of marked) {
+						const rect = leerRect(el);
+						// bottom <= 0 significa que la etiqueta entera está por encima
+						// de la ventana. De todas esas, la que tenga el mayor bottom es
+						// la más cercana a la barra, o sea la última que se dejó atrás.
+						if (rect.bottom <= 0 && rect.bottom > masReciente) {
+							masReciente = rect.bottom;
+							pasada = el;
+						}
+					}
+					if (pasada) morph(pasada.dataset.navLabel ?? '');
+					return;
+				}
+
+				const candidato = elegido.dataset.navLabel ?? '';
+				// Si coincide con la que ya pone no hay nada que decidir: morph la
+				// ignora igualmente, pero ahorrarse la llamada deja clara la intención.
+				if (candidato === current) return;
+
+				morph(candidato);
+			};
+
+			// Se agrupa en un temporizador: en una ráfaga de scroll llegan muchas
+			// notificaciones y solo se calcula una vez, al final.
+			const pedir = () => {
+				if (scheduled) return;
+				scheduled = window.setTimeout(actualizar, 90);
+			};
+
+			window.addEventListener('scroll', pedir, { passive: true });
+			window.addEventListener('resize', pedir, { passive: true });
+
+			// Recogida de la etiqueta en la barra.
+			//
+			// El header adopta la etiqueta más cercana al centro, y en el hero eso
+			// pasa mientras la frase del rol sigue a unos píxeles por debajo de la
+			// barra. Se leían los dos textos seguidos y parecía un error.
+			//
+			// La copia de la página se atenua a medida que sube, de forma que cuando
+			// la barra la recoge ya no queda copia debajo: el texto "pasa a la
+			// barra". También limpia el fantasma que se intuye a través del cristal.
+			//
+			// Va en su propio requestAnimationFrame y no en el de 90 ms: ese es un
+			// debounce de un solo disparo, así que el fundido quedaría a saltos. Se
+			// escribe directamente, sin transición, porque el valor tiene que seguir
+			// al scroll al mismo ritmo y no con retardo.
+			// `altoBarra` se declara arriba, junto a la selección: los dos están
+			// midiendo lo mismo y no hace falta duplicarlo.
+			// Por encima de esto se ve completa; solo se atenúa la franja pegada a
+			// la barra. Sin este tope, cualquier titular a media pantalla estaría
+			// semitransparente y parecería que se hubiese desvanecido sin querer.
+			const COMPLETA = 200;
+			let pidiendo = 0;
+
+			const pintarRecogida = () => {
+				pidiendo = 0;
+				for (const el of marked) {
+					const top = el.getBoundingClientRect().top;
+					if (top >= COMPLETA) {
+						// Sin estilo en línea: así manda el reveal, que puede estar
+						// animándose en ese momento. Con el valor en línea el estilo
+						// ganaría al selector y el titular aparecería antes de lo debido.
+						if (el.style.opacity) el.style.opacity = '';
+						continue;
+					}
+					// Suave en los dos extremos para que no se note el borde.
+					const t = (top - altoBarra) / (COMPLETA - altoBarra);
+					const c = t < 0 ? 0 : t > 1 ? 1 : t;
+					el.style.opacity = (c * c * (3 - 2 * c)).toFixed(2);
+				}
+			};
+
+			const pedirRecogida = () => {
+				if (pidiendo) return;
+				pidiendo = requestAnimationFrame(pintarRecogida);
+			};
+
+			window.addEventListener('scroll', pedirRecogida, { passive: true });
+			window.addEventListener('resize', () => {
+				altoBarra = document.querySelector('.site-header')?.offsetHeight ?? 64;
+				pedirRecogida();
+			});
+			// Arranca con el estado del scroll restaurado, si lo hay.
+			pedirRecogida();
+		}
+	}
+</script>

@@ -1,0 +1,76 @@
+---
+/**
+ * Marcas de registro de una lámina.
+ *
+ * Ocho trazos de 1px que continúan el marco por fuera de cada esquina y se
+ * trazan al entrar en pantalla, reutilizando los keyframes de la rejilla del
+ * hero (`line-grow-x` / `line-grow-y`). El color es el mismo hairline del
+ * marco. La geometría va en línea porque depende de la caja de cada trazo.
+ *
+ * El `<figure>` que las hospeda tiene que ser `relative`.
+ */
+interface Props {
+	/** Semilla para que cada lámina tenga su propio ritmo de trazado. */
+	seed?: number;
+}
+
+const { seed = 0 } = Astro.props;
+
+// Longitud del trazo. La misma para todos: es una marca, no decoración.
+// Restricción de maquetación: cada trazo sobresale B+L (15px) por esquina,
+// así que entre dos láminas hacen falta 2*(B+L) = 30px para que las marcas
+// enfrentadas no se solapen. Por eso los grids que alojan láminas usan
+// gap-10 (40px). Si cambia L, hay que revisar esos gaps.
+const L = 14;
+
+// Grosor del borde del marco. Un hijo absoluto se posiciona respecto a la caja
+// de padding, que está 1px dentro de la línea visual del borde: hay que
+// compensarlo para que las marcas nazcan de la esquina que se ve, no de la
+// caja interna.
+const B = 1;
+
+// Ruido determinista, el mismo que el de la rejilla del hero, para que cada
+// trazo conserve su retardo y su duración entre builds.
+const noise = (n: number) => {
+	const x = Math.sin(n * 12.9898) * 43758.5453;
+	return x - Math.floor(x);
+};
+const timing = (i: number) => ({
+	d: Math.round(noise((i + seed) * 7.31) * 260),
+	dur: 500 + Math.round(noise((i + seed) * 3.17) * 400),
+});
+
+// Dos trazos por esquina. `eje` elige el keyframe (x = horizontal, y =
+// vertical); `from` decide de qué extremo nace el trazado, que es siempre la
+// esquina. Cada trazo se alinea con la línea del borde que prolonga: la `top`/
+// `bottom` del horizontal cae sobre el borde, y el `left`/`right` del vertical
+// cae sobre el borde del lado, de modo que la marca continúa el marco.
+const marcas = [
+	// Esquina superior izquierda
+	{ eje: 'x', from: 'from-right', box: `top:${-B}px;left:${-(B + L)}px;width:${L}px` },
+	{ eje: 'y', from: 'from-bottom', box: `left:${-B}px;top:${-(B + L)}px;height:${L}px` },
+	// Esquina superior derecha
+	{ eje: 'x', from: 'from-left', box: `top:${-B}px;left:auto;right:${-(B + L)}px;width:${L}px` },
+	{ eje: 'y', from: 'from-bottom', box: `left:auto;right:${-B}px;top:${-(B + L)}px;height:${L}px` },
+	// Esquina inferior izquierda. El `bottom` negativo es lo que hace que el
+	// trazo vertical salga hacia abajo; con `bottom: 0` se dibujaba dentro.
+	{ eje: 'x', from: 'from-right', box: `top:auto;bottom:${-B}px;left:${-(B + L)}px;width:${L}px` },
+	{ eje: 'y', from: 'from-top', box: `top:auto;bottom:${-(B + L)}px;left:${-B}px;height:${L}px` },
+	// Esquina inferior derecha
+	{ eje: 'x', from: 'from-left', box: `top:auto;bottom:${-B}px;left:auto;right:${-(B + L)}px;width:${L}px` },
+	{ eje: 'y', from: 'from-top', box: `top:auto;bottom:${-(B + L)}px;left:auto;right:${-B}px;height:${L}px` },
+];
+---
+
+{
+	marcas.map((marca, i) => {
+		const { d, dur } = timing(i);
+		return (
+			<span
+				class={`plate-mark plate-mark--${marca.eje} ${marca.from}`}
+				style={`${marca.box};--d:${d}ms;--dur:${dur}ms`}
+				aria-hidden="true"
+			/>
+		);
+	})
+}
