@@ -1,12 +1,27 @@
-import typography from '@tailwindcss/typography';
+import { fontMono } from "./src/styles/fonts";
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
+  // La clase `dark` la fija el script del <head> antes del primer paint.
+  darkMode: "class",
+  content: ["./src/**/*.{astro,html,js,ts,md,mdx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        paper: "var(--paper)",
+        surface: "var(--surface)",
+        ink: "var(--ink)",
+        muted: "var(--muted)",
+        hair: "var(--hair)",
+        dot: "var(--dot)",
+      },
+      fontFamily: {
+        mono: fontMono,
+      },
+      maxWidth: {
+        prose: "68ch",
+      },
+    },
   },
-  plugins: [
-    typography,
-  ],
+  plugins: [],
 };
