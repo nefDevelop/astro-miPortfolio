@@ -1,15 +1,9 @@
 ---
 title: "Recipe"
 highlight: "Node"
-type: "01 / Recetas MD"
-desc: "Plataforma de recetas basadas en archivos markdown."
-image: "../../assets/recipeNode-main.png"
-imageAlt: "Interfaz de la pagina princiapl de RecipeNode, mostrando las recetas."
-imagePosition: "object-center md:object-left"
-color: "text-green-600"
 lang: "es"
+route: "recipenode"
 order: 1
-github: "https://github.com/nefDevelop/RecipeNode"
 ---
 
 ## El Desafío
@@ -17,6 +11,20 @@ La mayoría de gestores de recetas dependen de nubes propietarias o bases de dat
 
 ## Solución Técnica
 El núcleo del proyecto es un servidor **Node.js** y **Express** optimizado para el manejo del sistema de archivos y sincronización en tiempo real.
+
+### Arquitectura de datos
+El recorrido de una receta, desde que se edita en cualquier archivo hasta que se refleja en todos los dispositivos conectados:
+
+```mermaid
+flowchart TD
+    Editor["Obsidian / editor"] -->|escribe| FS[("recetas/*.md")]
+    FS -->|evento| Watch[chokidar]
+    Watch --> Server["Servidor Express (Node.js)"]
+    Server -->|front-matter + marked| Render["HTML renderizado"]
+    Server <--> SQLite[("SQLite · WAL")]
+    Server <-->|Socket.io| UI["UI en tiempo real"]
+    UI --> Planner["Planificador y lista de la compra"]
+```
 
 ### Puntos Clave de la Implementación:
 - **Markdown como Base de Datos:** Las recetas son archivos `.md`. Un sistema de vigilancia (`chokidar`) monitoriza la carpeta y actualiza la aplicación automáticamente al detectar cambios, renderizando con `front-matter` y `marked`.

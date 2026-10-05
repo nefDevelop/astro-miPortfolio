@@ -1,15 +1,9 @@
 ---
 title: "re"
 highlight: "GIO"
-type: "02 / Reverse Proxy"
-desc: "Lightweight Reverse Proxy in Go designed to protect internal services with centralized authentication and advanced security."
-image: "../../assets/regio-main.png"
-imageAlt: "reGIO login interface showing the centralized authentication system"
-imagePosition: "object-center"
-color: "text-blue-500"
 lang: "en"
+route: "regio"
 order: 2
-github: "https://github.com/nefDevelop/regio"
 ---
 
 ## The Challenge

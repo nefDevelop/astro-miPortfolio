@@ -1,15 +1,9 @@
 ---
 title: "Recipe"
 highlight: "Node"
-type: "01 / MD Recipes"
-desc: "A recipe platform based on Markdown files."
-image: "../../assets/recipeNode-main.png"
-imageAlt: "Interface of the RecipeNode main page, displaying recipes."
-imagePosition: "object-center md:object-left"
-color: "text-green-600"
 lang: "en"
+route: "recipenode"
 order: 1
-github: "https://github.com/nefDevelop/RecipeNode"
 ---
 
 ## The Challenge
@@ -17,6 +11,20 @@ Most recipe managers rely on proprietary clouds or opaque databases that make po
 
 ## Technical Solution
 The core of the project is a **Node.js** and **Express** server optimized for file system operations and real-time synchronization.
+
+### Data Architecture
+The journey of a recipe, from being edited in any file to showing up on every connected device:
+
+```mermaid
+flowchart TD
+    Editor["Obsidian / any editor"] -->|writes| FS[("recipes/*.md")]
+    FS -->|event| Watch[chokidar]
+    Watch --> Server["Express server (Node.js)"]
+    Server -->|front-matter + marked| Render["Rendered HTML"]
+    Server <--> SQLite[("SQLite · WAL")]
+    Server <-->|Socket.io| UI["Real-time UI"]
+    UI --> Planner["Meal planner & shopping list"]
+```
 
 ### Implementation Highlights:
 - **Markdown as Database:** Recipes are `.md` files. A file-watching system (`chokidar`) monitors the directory and automatically updates the app upon detecting changes, rendering content with `front-matter` and `marked`.

@@ -1,67 +1,193 @@
 ---
-import { projects } from '../data/portfolio';
-import { ui } from '../i18n/translations';
+import { Image } from 'astro:assets';
+import { ui, type Locale } from '../i18n/translations';
+import { projects, otherProjects } from '../data/portfolio';
+import { localePath } from '../lib/paths';
+import PlateMarks from './PlateMarks.astro';
 
-const { lang = Astro.currentLocale || 'es' } = Astro.props;
-const currentProjects = projects[lang as keyof typeof projects];
-const t = ui[lang as keyof typeof ui];
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const list = projects[lang];
+const extras = otherProjects[lang];
 ---
 
-<section class="relative">
-	{currentProjects.map((project) => (
-		<article class="project-container h-[125vh]">
-			<div class="project-sticky">
-				<div class="project-slider">
-					
-					<!-- Slide 1: Intro -->
-					<div class="project-slide relative w-full h-full overflow-hidden border-r border-white/5" aria-label={`Introducción del proyecto ${project.title}`}>
-						<img src={typeof project.image === 'string' ? project.image : project.image.src} class={`absolute top-0 left-0 md:top-1/2 md:-translate-y-1/2 md:left-10 w-full h-[45%] md:h-auto md:w-[65%] md:aspect-video object-cover ${project.imagePosition || ''} rounded-b-[3rem] md:rounded-[2rem] md:[mask-image:linear-gradient(to_right,black_50%,transparent_75%)] shadow-2xl`} alt={project.imageAlt || `Captura de pantalla del proyecto ${project.title}`} />
-						<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
-							<div class="w-full md:w-1/2 md:ml-auto space-y-6 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
-								<span class={`${project.color} font-mono tracking-widest`}>{project.type}</span>
-								<h2 class="text-5xl md:text-7xl font-bold text-white tracking-tighter">{project.title}<span class={project.color}>{project.highlight}</span></h2>
-								<p class="text-xl text-gray-400 leading-relaxed">{project.desc}</p>
-								<a href={`/projects/${project.title === 'Recipe' ? 'recipenode' : (project.title + project.highlight).toLowerCase()}-${lang}`} class="inline-flex items-center gap-2 px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-slate-200 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900">
-									{t.projects.caseStudy}
-								</a>
-							</div>
-						</div>
-					</div>
+<section id="proyectos" class="mx-auto max-w-5xl scroll-mt-24 px-5 py-20">
+	<header class="max-w-prose" data-reveal>
+		<h2 class="meta text-dot">{t.projects.title}</h2>
+		<p class="mt-4 max-w-prose text-xl leading-relaxed sm:text-2xl">
+			{t.projects.subtitle}
+		</p>
+	</header>
 
-					<!-- Additional Slides -->
-					{project.slides.map((slide, index) => (
-						<div class="project-slide relative w-full h-full overflow-hidden border-r border-white/5" aria-label={`Detalle: ${slide.title}`}>
-							<img src={typeof slide.image === 'string' ? slide.image : slide.image.src} class={`absolute top-0 left-0 md:top-1/2 md:-translate-y-1/2 md:left-10 w-full h-[45%] md:h-auto md:w-[65%] md:aspect-video object-cover ${slide.imagePosition || ''} rounded-b-[3rem] md:rounded-[2rem] md:[mask-image:linear-gradient(to_right,black_50%,transparent_75%)] shadow-2xl`} alt={slide.imageAlt || slide.title} />
-							<div class="absolute inset-0 z-10 flex flex-col justify-end md:justify-center p-8 md:p-20">
-								<div class="w-full md:w-1/2 md:ml-auto space-y-6 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
-									<h3 class="text-4xl font-bold text-white">{slide.title}</h3>
-									<p class="text-xl text-gray-400 leading-relaxed">{slide.desc}</p>
-									
-									{slide.tags && (
-										<div class="flex flex-wrap gap-3">
-											{slide.tags.map(tag => (
-												<span class="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-cyan-300">{tag}</span>
-											))}
-										</div>
-									)}
+	{
+		list.map((project, indice) => (
+			<article class="mt-16 border-t border-hair pt-10" data-reveal>
+				<div class="flex flex-col gap-2">
+					<p class="meta">{project.type}</p>
+					<h3 class="text-2xl font-bold tracking-tight sm:text-3xl" data-nav-label={`${project.title}${project.highlight}`}>
+						{project.title}{project.highlight}
+					</h3>
+				</div>
 
-									{index === project.slides.length - 1 && slide.link && (
-										<div class="flex flex-wrap gap-4">
-											<a href={slide.link} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-8 py-3 bg-emerald-500 text-black font-bold rounded-full hover:bg-emerald-400 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-900">
-												<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-													<path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
-												</svg>
+				<p class="mt-4 max-w-prose text-lg leading-relaxed text-muted">{project.desc}</p>
+
+				<ul class="mt-5 flex flex-wrap gap-2">
+					{project.stack.map((tech) => (
+						<li class="chip rounded-full border border-hair px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-muted">
+							{tech}
+						</li>
+					))}
+				</ul>
+
+				{/* Lámina: la captura enmarcada como una página de manual técnico */}
+				<figure class="relative mt-8 border border-hair bg-surface p-2" data-plate>
+					<PlateMarks seed={indice * 13} />
+					<Image
+						src={project.image}
+						alt={project.imageAlt || project.title}
+						width={1200}
+						height={750}
+						widths={[480, 800, 1200]}
+						sizes="(min-width: 1024px) 640px, 100vw"
+						loading={indice === 0 ? 'eager' : 'lazy'}
+						fetchpriority={indice === 0 ? 'high' : undefined}
+						class={`aspect-video w-full object-cover ${project.imagePosition || ''}`}
+					/>
+				</figure>
+
+				<div class="mt-10 grid gap-10 sm:grid-cols-3">
+					{project.slides.map((slide, s) => (
+						<figure class="relative flex flex-col border border-hair bg-surface p-2" data-plate>
+							<PlateMarks seed={s + 5} />
+							<Image
+								src={slide.image}
+								alt={slide.imageAlt || slide.title}
+								width={800}
+								height={600}
+								widths={[400, 800]}
+								sizes="(min-width: 640px) 30vw, 100vw"
+								loading="lazy"
+								class={`aspect-[4/3] w-full object-cover ${slide.imagePosition || ''}`}
+							/>
+							<figcaption class="flex flex-1 flex-col gap-2 p-3">
+								<h4 class="font-semibold">{slide.title}</h4>
+								<p class="text-sm leading-relaxed text-muted">{slide.desc}</p>
+								{slide.tags && (
+									<ul class="mt-auto flex flex-wrap gap-2 pt-2">
+										{slide.tags.map((tag) => (
+											<li class="font-mono text-xs uppercase tracking-widest text-dot">{tag}</li>
+										))}
+									</ul>
+								)}
+							</figcaption>
+						</figure>
+					))}
+				</div>
+
+				{/* Los CTA cierran el artículo, tras la evidencia de las láminas:
+				    el mismo patrón que la página de caso, que pone los botones
+				    al final. */}
+				<div class="mt-10 flex flex-wrap gap-3">
+					<a
+						href={localePath(lang, `projects/${project.slug}`)}
+						class="rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper ink-btn"
+					>
+						{t.projects.caseStudy}
+					</a>
+					{project.demo && (
+						<a
+							href={project.demo}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="rounded-full border border-hair px-5 py-2.5 text-sm font-medium wash"
+						>
+							{t.projects.liveDemo}
+						</a>
+					)}
+					{project.github && (
+						<a
+							href={project.github}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="rounded-full border border-hair px-5 py-2.5 text-sm font-medium wash"
+						>
+							{t.projects.viewRepo}
+						</a>
+					)}
+				</div>
+			</article>
+		))
+	}
+
+	{
+		/* Proyectos secundarios: tarjetas compactas en grid, sin caso de estudio.
+		    Los stubs no traen enlaces, así que la tarjeta se queda en imagen +
+		    texto hasta que se rellenen. */
+		extras.length > 0 && (
+			<div class="mt-20 border-t border-hair pt-10" data-reveal>
+				<h3 class="meta text-dot">{t.projects.others}</h3>
+				<div class="mt-8 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+					{extras.map((proyecto, i) => (
+						<article class="flex flex-col">
+							<figure class="relative border border-hair bg-surface p-2" data-plate>
+								<PlateMarks seed={i + 21} />
+								<Image
+									src={proyecto.image}
+									alt={proyecto.imageAlt || proyecto.title}
+									width={800}
+									height={600}
+									widths={[400, 800]}
+									sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
+									loading="lazy"
+									class={`aspect-video w-full object-cover ${proyecto.imagePosition || ''}`}
+								/>
+							</figure>
+							<div class="mt-4 flex flex-1 flex-col gap-2">
+								<p class="meta">{proyecto.type}</p>
+								<h4 class="text-lg font-semibold tracking-tight">
+									{proyecto.title}{proyecto.highlight}
+								</h4>
+								<p class="text-sm leading-relaxed text-muted">{proyecto.desc}</p>
+								<ul class="mt-1 flex flex-wrap gap-2">
+									{proyecto.stack.map((tech) => (
+										<li class="chip rounded-full border border-hair px-2.5 py-1 font-mono text-xs uppercase tracking-widest text-muted">
+											{tech}
+										</li>
+									))}
+								</ul>
+								{(proyecto.github || proyecto.demo) && (
+									<div class="mt-auto flex flex-wrap gap-4 pt-3">
+										{proyecto.demo && (
+											<a
+												href={proyecto.demo}
+												target="_blank"
+												rel="noopener noreferrer"
+												class="link-underline text-sm"
+											>
+												{t.projects.liveDemo}
+											</a>
+										)}
+										{proyecto.github && (
+											<a
+												href={proyecto.github}
+												target="_blank"
+												rel="noopener noreferrer"
+												class="link-underline text-sm"
+											>
 												{t.projects.viewRepo}
 											</a>
-										</div>
-									)}
-								</div>
+										)}
+									</div>
+								)}
 							</div>
-						</div>
+						</article>
 					))}
-
 				</div>
 			</div>
-		</article>
-	))}
+		)
+	}
 </section>
