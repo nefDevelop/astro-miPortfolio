@@ -125,8 +125,8 @@ const extras = otherProjects[lang];
 
 	{
 		/* Proyectos secundarios: tarjetas compactas en grid, sin caso de estudio.
-		    Los stubs no traen enlaces, así que la tarjeta se queda en imagen +
-		    texto hasta que se rellenen. */
+		    El enlace de repositorio o demo solo aparece si el proyecto declara
+		    una URL; si no, la tarjeta se queda en imagen + texto. */
 		extras.length > 0 && (
 			<div class="mt-20 border-t border-hair pt-10" data-reveal>
 				<h3 class="meta text-dot">{t.projects.others}</h3>

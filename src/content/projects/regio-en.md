@@ -3,7 +3,7 @@ title: "re"
 highlight: "GIO"
 lang: "en"
 route: "regio"
-order: 2
+order: 1
 ---
 
 ## The Challenge

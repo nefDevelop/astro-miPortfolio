@@ -3,7 +3,7 @@ export const ui = {
     meta: {
       title: "Neftalí Domínguez — Desarrollador Full Stack Junior",
       description:
-        "Desarrollador Full Stack Junior (TypeScript, React, Node.js, Go) buscando prácticas en empresa. Dos proyectos completos con caso de estudio: RecipeNode y reGIO.",
+        "Desarrollador Full Stack Junior (TypeScript, React, Node.js, Go) buscando prácticas en empresa. Cuatro proyectos con caso de estudio: seguridad, archivado web, biblioteca digital y un IDE.",
       siteName: "Neftalí Domínguez",
     },
     nav: {
@@ -59,7 +59,7 @@ export const ui = {
       title: "Proyectos",
       others: "Otros proyectos",
       subtitle:
-        "Dos proyectos completos, de principio a fin. Cada uno tiene su caso de estudio con el problema, las decisiones técnicas y lo que aprendí.",
+        "Cuatro proyectos completos, de principio a fin. Cada uno tiene su caso de estudio con el problema, las decisiones técnicas y lo que aprendí.",
       caseStudy: "Caso de estudio",
       back: "Volver al inicio",
       viewRepo: "Repositorio",
@@ -86,7 +86,7 @@ export const ui = {
     meta: {
       title: "Neftalí Domínguez — Junior Full Stack Developer",
       description:
-        "Junior Full Stack Developer (TypeScript, React, Node.js, Go) looking for an internship. Two complete projects with case studies: RecipeNode and reGIO.",
+        "Junior Full Stack Developer (TypeScript, React, Node.js, Go) looking for an internship. Four projects with case studies: security, web archiving, a digital library and an IDE.",
       siteName: "Neftalí Domínguez",
     },
     nav: {
@@ -140,7 +140,7 @@ export const ui = {
       title: "Projects",
       others: "Other projects",
       subtitle:
-        "Two complete projects, built end to end. Each one has a case study covering the problem, the technical decisions and what I learned.",
+        "Four complete projects, built end to end. Each one has a case study covering the problem, the technical decisions and what I learned.",
       caseStudy: "Case study",
       back: "Back to home",
       viewRepo: "Repository",
