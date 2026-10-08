@@ -69,14 +69,27 @@ const lines = [...build('v', Math.round(MAX_W / TILE), 0), ...build('h', Math.ro
 				><span class="dot-land text-dot">.</span>
 				{/* Plataforma de aterrizaje: se enciende en el mismo instante que el punto
 				    termina su vuelo, para que la rejilla lea como el sistema del que
-				    el punto forma parte. */}
+				    el punto forma parte.
+				    Es un SVG con `shape-rendering="crispEdges"` y geometría entera: con
+				    líneas de 1px hechas con bordes CSS y posicionadas en fracciones de
+				    píxel, el navegador las difuminaba a 100% y el conjunto parecía un
+				    cuadrado borroso. El SVG desactiva el suavizado y las mantiene duras. */}
 				<span
-					class="landing-pad pointer-events-none absolute bottom-[0.15rem] left-[1.5rem] hidden h-3.5 w-3.5 place-items-center lg:grid"
+					class="landing-pad pointer-events-none absolute bottom-[2px] left-6 hidden text-dot lg:block"
 					aria-hidden="true"
 				>
-					<span class="absolute h-px w-full bg-dot"></span>
-					<span class="absolute h-full w-px bg-dot"></span>
-					<span class="h-1.5 w-1.5 border border-dot"></span>
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 14 14"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1"
+						shape-rendering="crispEdges"
+					>
+						<path d="M0 7h14M7 0v14" />
+						<rect x="4" y="4" width="6" height="6" />
+					</svg>
 				</span>
 			</span>
 		</h1>
