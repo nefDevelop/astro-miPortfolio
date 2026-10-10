@@ -29,3 +29,6 @@ Implementé un sistema de autenticación centralizada que actúa como una aduana
 
 ## Resultados
 reGIO expone servicios de forma segura con un binario de menos de 15MB y un consumo que rara vez supera los **20MB de RAM**. Es la solución ideal para entornos auto-alojados (Self-Hosted) que priorizan la seguridad sin sacrificar el rendimiento.
+
+## Aprendizaje
+reGIO me enseñó a pensar como quien ataca el servicio, no como quien lo configura: casi todas las capas nacieron de imaginar cómo se saltaría la anterior. Y que en seguridad la amenaza no es solo el atacante, sino la complejidad: cada medida que añades es otra pieza que mantener al día, y un binario pequeño que se despliega en minutos es más defendible que un stack pesado que nadie actualiza.

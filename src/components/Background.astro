@@ -13,9 +13,9 @@ const t = ui[lang];
 // complementos. La experiencia ocupa dos columnas porque es lo que da contexto
 // a quien cambia de sector; los otros dos caben en paralelo.
 const blocks: { title: string; items: Entry[]; ancho?: boolean }[] = [
-	{ title: t.background.jobs, items: experience, ancho: true },
-	{ title: t.background.education, items: education },
-	{ title: t.background.certifications, items: certifications },
+	{ title: t.background.jobs, items: experience[lang], ancho: true },
+	{ title: t.background.education, items: education[lang] },
+	{ title: t.background.certifications, items: certifications[lang] },
 ].filter((block) => block.items.length > 0);
 ---
 

@@ -3,7 +3,7 @@ export const ui = {
     meta: {
       title: "Neftalí Domínguez — Desarrollador Full Stack Junior",
       description:
-        "Desarrollador Full Stack Junior (TypeScript, React, Node.js, Go) buscando prácticas en empresa. Cuatro proyectos con caso de estudio: seguridad, archivado web, biblioteca digital y un IDE.",
+        "Desarrollador Full Stack Junior (TypeScript, Node.js, Go, Svelte, Astro) buscando prácticas en empresa. Cuatro proyectos con caso de estudio: seguridad, archivado web, biblioteca digital y un gestor de contraseñas.",
       siteName: "Neftalí Domínguez",
     },
     nav: {
@@ -14,7 +14,12 @@ export const ui = {
       menu: "Menú",
       theme: "Cambiar entre modo día y noche",
       skipToContent: "Ir al contenido",
-      switchLang: { es: "Cambiar a inglés", en: "Cambiar a español" },
+      // La etiqueta nombra el cambio al OTRO idioma y va en el idioma de la
+      // página actual: en /es/ el botón lleva a /en/, así que anuncia "cambiar
+      // a inglés". Es un string y no un mapa por clave porque cada página solo
+      // tiene un destino (los dos idiomas); con el mapa, tres de las cuatro
+      // entradas eran inalcanzables y las que se leían anunciaban lo contrario.
+      switchLang: "Cambiar a inglés",
       label: {
         home: "Neftalí Domínguez — inicio",
         role: "Desarrollador Full Stack Junior",
@@ -86,7 +91,7 @@ export const ui = {
     meta: {
       title: "Neftalí Domínguez — Junior Full Stack Developer",
       description:
-        "Junior Full Stack Developer (TypeScript, React, Node.js, Go) looking for an internship. Four projects with case studies: security, web archiving, a digital library and an IDE.",
+        "Junior Full Stack Developer (TypeScript, Node.js, Go, Svelte, Astro) looking for an internship. Four projects with case studies: security, web archiving, a digital library and a password manager.",
       siteName: "Neftalí Domínguez",
     },
     nav: {
@@ -97,7 +102,7 @@ export const ui = {
       menu: "Menu",
       theme: "Toggle light and dark mode",
       skipToContent: "Skip to content",
-      switchLang: { es: "Switch to English", en: "Cambiar a español" },
+      switchLang: "Switch to Spanish",
       label: {
         home: "Neftalí Domínguez — home",
         role: "Junior Full Stack Developer",

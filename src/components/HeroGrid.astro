@@ -1,0 +1,50 @@
+---
+/**
+ * Rejilla del hero, compartida por la portada y los casos de estudio.
+ *
+ * Trazado de la rejilla: cada línea es un elemento para que llegue con su
+ * propio retardo, su propia duración y desde su propio origen. El ruido es
+ * determinista (hash del índice) para que la retícula sea la misma en cada
+ * build y se pueda depurar comparando capturas.
+ *
+ * El padre que la hospeda tiene que ser `relative` (cubre hasta su `bottom: 0`).
+ */
+const TILE = 40; // px — coincide con --bleed/2 del grid de 2.5rem
+const MAX_W = 2400;
+const MAX_H = 1400;
+
+const noise = (n: number) => {
+	const x = Math.sin(n * 12.9898) * 43758.5453;
+	return x - Math.floor(x);
+};
+
+type Line = { axis: 'v' | 'h'; pos: number; delay: number; duration: number; from: string };
+
+const build = (axis: 'v' | 'h', count: number, seed: number): Line[] =>
+	Array.from({ length: count }, (_, i) => {
+		const delay = Math.round(noise((i + seed) * 7.31) * 700);
+		const duration = 800 + Math.round(noise((i + seed) * 3.17) * 600);
+		const roll = noise((i + seed) * 11.7);
+		const from = axis === 'v' ? (roll > 0.5 ? 'from-bottom' : 'from-top') : roll > 0.5 ? 'from-right' : 'from-left';
+		return { axis, pos: i * TILE, delay, duration, from };
+	});
+
+const lines = [...build('v', Math.round(MAX_W / TILE), 0), ...build('h', Math.round(MAX_H / TILE), 100)];
+---
+
+<div class="hero-grid" aria-hidden="true">
+	<div class="grid-field">
+	{
+		lines.map((line) => (
+			<span
+				class={
+					line.axis === 'v'
+						? `grid-line grid-line--v ${line.from}`
+						: `grid-line grid-line--h ${line.from}`
+				}
+				style={`--d:${line.delay}ms;--dur:${line.duration}ms;${line.axis === 'v' ? `left:${line.pos}px` : `top:${line.pos}px`}`}
+			/>
+		))
+	}
+	</div>
+</div>

@@ -11,6 +11,7 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = ui[lang];
+const texto = about[lang];
 
 // Las etiquetas de grupo se traducen; los items no, porque "Docker" es igual
 // en los dos idiomas y vive en portfolio.ts.
@@ -50,8 +51,8 @@ const idiomas = [...t.about.languages.items];
 
 		<div data-reveal>
 			<h2 class="meta text-dot" data-nav-label={t.nav.label.about}>{t.about.title}</h2>
-			<p class="mt-4 max-w-prose text-xl leading-relaxed">{about.description_1}</p>
-			<p class="mt-4 max-w-prose leading-relaxed text-muted">{about.description_2}</p>
+			<p class="mt-4 max-w-prose text-xl leading-relaxed">{texto.description_1}</p>
+			<p class="mt-4 max-w-prose leading-relaxed text-muted">{texto.description_2}</p>
 
 			<h3 class="meta mt-10">{t.about.stack}</h3>
 			<div class="mt-4 space-y-5">

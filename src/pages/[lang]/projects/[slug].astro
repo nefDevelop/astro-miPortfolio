@@ -6,6 +6,7 @@ import { ui, type Locale } from '../../../i18n/translations';
 import { localePath } from '../../../lib/paths';
 import { projects } from '../../../data/portfolio';
 import PlateMarks from '../../../components/PlateMarks.astro';
+import HeroGrid from '../../../components/HeroGrid.astro';
 
 export async function getStaticPaths() {
 	const projects = await getCollection('projects');
@@ -46,17 +47,22 @@ const description = ficha?.desc ?? '';
 	lang={lang}
 	path={`projects/${project.data.route}`}
 >
-	<article class="mx-auto max-w-3xl px-5 pb-8 pt-14">
-		<a href={`/${lang}/`} class="meta link-underline">&larr; {t.projects.back}</a>
+	<div class="relative isolate">
+		<HeroGrid />
+		<div class="mx-auto max-w-3xl px-5 pt-14">
+			<a href={`/${lang}/`} class="meta link-underline">&larr; {t.projects.back}</a>
 
-		<header class="mt-10" data-reveal>
-			<p class="meta">{ficha?.type ?? ''}</p>
-			<h1 class="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
-				{project.data.title}<span class="text-dot">{project.data.highlight}</span>
-			</h1>
-			<p class="mt-5 text-xl leading-relaxed text-muted">{description}</p>
-		</header>
+			<header class="mt-10" data-reveal>
+				<p class="meta">{ficha?.type ?? ''}</p>
+				<h1 class="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
+					{project.data.title}<span class="text-dot">{project.data.highlight}</span>
+				</h1>
+				<p class="mt-5 text-xl leading-relaxed text-muted">{description}</p>
+			</header>
+		</div>
+	</div>
 
+	<article class="mx-auto max-w-3xl px-5 pb-8">
 		<dl class="mt-10 grid gap-4 border-y border-hair py-6 sm:grid-cols-2" data-reveal>
 			<div>
 				<dt class="meta">{t.projects.roleLabel}</dt>
@@ -76,7 +82,7 @@ const description = ficha?.desc ?? '';
 			</div>
 		</dl>
 
-		<figure class="relative mt-10 border border-hair bg-surface p-2" data-reveal data-plate>
+		<figure class="relative mt-10 border border-hair bg-surface p-2" data-reveal data-plate data-zoom>
 			<PlateMarks seed={1} />
 			<Image
 				src={ficha?.image}
@@ -100,7 +106,7 @@ const description = ficha?.desc ?? '';
 					<h2 class="meta text-dot">{t.projects.details}</h2>
 					<div class="mt-6 grid gap-10 sm:grid-cols-2">
 						{ficha.slides.map((slide, s) => (
-							<figure class="relative flex flex-col border border-hair bg-surface p-2" data-plate>
+							<figure class="relative flex flex-col border border-hair bg-surface p-2" data-plate data-zoom>
 								<PlateMarks seed={s + 11} />
 								<Image
 									src={slide.image}
@@ -116,9 +122,9 @@ const description = ficha?.desc ?? '';
 									<h3 class="font-semibold">{slide.title}</h3>
 									<p class="text-sm leading-relaxed text-muted">{slide.desc}</p>
 									{slide.tags && (
-										<ul class="mt-auto flex flex-wrap gap-2 pt-2">
-											{slide.tags.map((tag) => (
-												<li class="font-mono text-xs uppercase tracking-widest text-dot">{tag}</li>
+										<ul class="mt-auto flex flex-wrap gap-x-4 gap-y-1 pt-2">
+											{slide.tags.map((tag, i) => (
+												<li class="flex items-center gap-4 font-mono text-xs uppercase tracking-widest text-dot">{i > 0 && (<span aria-hidden="true" class="opacity-40">|</span>)}{tag}</li>
 											))}
 										</ul>
 									)}
@@ -283,6 +289,134 @@ const description = ficha?.desc ?? '';
 	}
 </script>
 
+<script>
+	// Visor de láminas: pulsar una captura la abre a tamaño completo en un
+	// <dialog> nativo (Esc y clic en el fondo lo cierran). Sin JS las imágenes
+	// se ven igual, solo que sin visor: es mejora progresiva, no un gate.
+	const laminas = Array.from(document.querySelectorAll<HTMLElement>("[data-zoom]"));
+
+	if (laminas.length > 0) {
+		const dialogo = document.createElement("dialog");
+		dialogo.className = "case-zoom";
+		dialogo.setAttribute("aria-label", "Vista ampliada de la captura");
+		// Ocho trazos de 1px como las marcas de registro de las láminas
+		// (`PlateMarks.astro`, L=14, B=1): aquí son estáticos, sin trazado.
+		const marcas = [
+			"top:-1px;left:-15px;width:14px",
+			"left:-1px;top:-15px;height:14px",
+			"top:-1px;left:auto;right:-15px;width:14px",
+			"left:auto;right:-1px;top:-15px;height:14px",
+			"top:auto;bottom:-1px;left:-15px;width:14px",
+			"top:auto;bottom:-15px;left:-1px;height:14px",
+			"top:auto;bottom:-1px;left:auto;right:-15px;width:14px",
+			"top:auto;bottom:-15px;left:auto;right:-1px;height:14px",
+		]
+			.map(
+				(caja, i) =>
+					`<span class="plate-mark ${i % 2 === 0 ? "plate-mark--x" : "plate-mark--y"}" style="${caja}" aria-hidden="true"></span>`,
+			)
+			.join("");
+		dialogo.innerHTML =
+			'<button type="button" class="case-zoom-btn case-zoom-close" aria-label="Cerrar vista ampliada">✕</button>' +
+			`<div class="case-zoom-frame">${marcas}<img class="case-zoom-img" alt="" /></div>` +
+			'<button type="button" class="case-zoom-btn case-zoom-prev" data-nav="-1" aria-label="Captura anterior">‹</button>' +
+			'<button type="button" class="case-zoom-btn case-zoom-next" data-nav="1" aria-label="Captura siguiente">›</button>' +
+			'<div class="case-zoom-bar">' +
+			'<div class="case-zoom-meta"><p class="case-zoom-caption"></p><p class="case-zoom-count" aria-live="polite"></p></div>' +
+			"</div>";
+		document.body.appendChild(dialogo);
+
+		const vista = dialogo.querySelector<HTMLImageElement>(".case-zoom-img");
+		const pie = dialogo.querySelector<HTMLElement>(".case-zoom-caption");
+		const cuenta = dialogo.querySelector<HTMLElement>(".case-zoom-count");
+
+		dialogo.addEventListener("click", (evento) => {
+			// Clic en el fondo (no en la imagen ni en el pie): cerrar.
+			if (evento.target === dialogo) dialogo.close();
+		});
+		dialogo.querySelector(".case-zoom-close")?.addEventListener("click", () => dialogo.close());
+
+		const imagenes = laminas
+			.map((lamina) => lamina.querySelector<HTMLImageElement>("img"))
+			.filter((img): img is HTMLImageElement => img !== null);
+		let indice = 0;
+
+		// La candidata mayor del `srcset` que genera Astro: `currentSrc`
+		// devuelve la versión pequeña que la página muestra en rejilla
+		// (400px en slides) y el visor la abría a ese tamaño.
+		const mayorSrc = (img: HTMLImageElement): string => {
+			const set = img.getAttribute("srcset");
+			if (!set) return img.src;
+			let mejorUrl = img.src;
+			let mejorW = 0;
+			let mejorX = 0;
+			for (const parte of set.split(",")) {
+				const trozos = parte.trim().split(/\s+/);
+				if (!trozos[0]) continue;
+				const url = trozos[0];
+				const desc = trozos[1] ?? "";
+				if (desc.endsWith("w")) {
+					const w = parseInt(desc, 10);
+					if (w > mejorW) {
+						mejorW = w;
+						mejorUrl = url;
+					}
+				} else if (desc.endsWith("x")) {
+					const x = parseFloat(desc);
+					if (mejorW === 0 && x > mejorX) {
+						mejorX = x;
+						mejorUrl = url;
+					}
+				} else {
+					mejorUrl = url;
+				}
+			}
+			return mejorUrl;
+		};
+
+		const mostrar = (n: number) => {
+			if (!vista || !pie || !cuenta || imagenes.length === 0) return;
+			// Carrusel circular: tras la última vuelve la primera.
+			indice = ((n % imagenes.length) + imagenes.length) % imagenes.length;
+			const img = imagenes[indice];
+			// Siempre la mayor resolución disponible, no la que la
+			// página eligió para la miniatura (`currentSrc`).
+			vista.src = mayorSrc(img);
+			vista.alt = img.alt;
+			pie.textContent = img.alt;
+			pie.hidden = img.alt === "";
+			cuenta.textContent = `${indice + 1} / ${imagenes.length}`;
+		};
+
+		const abrir = (n: number) => {
+			mostrar(n);
+			dialogo.showModal();
+		};
+
+		dialogo.querySelectorAll<HTMLButtonElement>("[data-nav]").forEach((boton) =>
+			boton.addEventListener("click", () => mostrar(indice + Number(boton.dataset.nav || "0"))),
+		);
+		dialogo.addEventListener("keydown", (evento) => {
+			if (evento.key === "ArrowRight") mostrar(indice + 1);
+			else if (evento.key === "ArrowLeft") mostrar(indice - 1);
+		});
+
+		imagenes.forEach((img, i) => {
+			laminas[i].classList.add("zoomable");
+			img.tabIndex = 0;
+			img.setAttribute("role", "button");
+			img.setAttribute("aria-label", `Ampliar: ${img.alt}`);
+			img.addEventListener("click", () => abrir(i));
+			img.addEventListener("keydown", (evento) => {
+				if (evento.key === "Enter" || evento.key === " ") {
+					evento.preventDefault();
+					abrir(i);
+				}
+			});
+		});
+	}
+</script>
+
 <style is:global>
 	/* El contenido viene de Markdown, así que necesita estilos globales. */
 	.case-body {
@@ -428,5 +562,137 @@ const description = ficha?.desc ?? '';
 		font-size: 0.85rem;
 		white-space: pre-wrap;
 		color: var(--muted);
+	}
+
+	/* Visor de láminas. Solo existe si hay JS: sin él las figuras se ven
+	   igual y nada indica que sean pulsables. */
+	[data-zoom].zoomable img {
+		cursor: zoom-in;
+	}
+
+	[data-zoom].zoomable img:focus-visible {
+		outline: 2px solid var(--dot);
+		outline-offset: 2px;
+	}
+
+	.case-zoom {
+		background: transparent;
+		border: 0;
+		padding: 0;
+		/* Visible para que las marcas de las esquinas (±15px) no generen
+		   scroll lateral; el ancho reserva esos 2rem. */
+		overflow: visible;
+		width: min(1200px, calc(94vw - 2rem));
+		max-width: min(1200px, calc(94vw - 2rem));
+	}
+
+	/* Fondo oscuro con fragmentos de rejilla hacia los bordes: el velo
+	   radial la oculta tras la imagen y en el filo exterior. Las líneas van
+	   en blanco fijo porque `--hair` es un 16% y sobre negro se pierde. */
+	.case-zoom::backdrop {
+		background-color: #000;
+		background-image:
+			radial-gradient(ellipse at 50% 50%, #000 28%, transparent 52%, #000 100%),
+			linear-gradient(rgb(255 255 255 / 0.1) 1px, transparent 1px),
+			linear-gradient(90deg, rgb(255 255 255 / 0.1) 1px, transparent 1px);
+		background-size: auto, 40px 40px, 40px 40px;
+	}
+
+	/* La lámina del visor: mismo marco y marcas que las de la página. */
+	.case-zoom-frame {
+		position: relative;
+		background: var(--surface);
+		border: 1px solid var(--hair);
+		padding: 0.5rem;
+	}
+
+	.case-zoom-img {
+		display: block;
+		max-width: 100%;
+		max-height: 72vh;
+		width: auto;
+		height: auto;
+		margin-inline: auto;
+	}
+
+	.case-zoom-bar {
+		margin-top: 0.75rem;
+	}
+
+	.case-zoom-meta {
+		flex: 1;
+		min-width: 0;
+		text-align: center;
+	}
+
+	.case-zoom-caption {
+		font-size: 0.875rem;
+		color: var(--paper);
+	}
+
+	.case-zoom-count {
+		margin-top: 0.25rem;
+		font-family: theme(fontFamily.mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.15em;
+		color: var(--paper);
+		opacity: 0.7;
+	}
+
+	.case-zoom-btn {
+		flex-shrink: 0;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 9999px;
+		border: 1px solid var(--hair);
+		background: var(--surface);
+		color: var(--ink);
+		font-size: 1.1rem;
+		line-height: 1;
+		cursor: pointer;
+	}
+
+	.case-zoom-close {
+		display: block;
+		margin: 0 0 0.5rem auto;
+		background: transparent;
+		border-color: transparent;
+		color: var(--paper);
+		opacity: 0.55;
+		width: 2rem;
+		height: 2rem;
+		font-size: 0.95rem;
+	}
+
+	/* Flechas fijas a los bordes de la pantalla: no se mueven con cada imagen. */
+	.case-zoom-prev,
+	.case-zoom-next {
+		position: fixed;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 1;
+	}
+
+	.case-zoom-prev {
+		left: 1rem;
+	}
+
+	.case-zoom-next {
+		right: 1rem;
+	}
+
+	@media (max-width: 640px) {
+		.case-zoom-prev {
+			left: 0.5rem;
+		}
+
+		.case-zoom-next {
+			right: 0.5rem;
+		}
+	}
+
+	.case-zoom-close:hover {
+		opacity: 1;
+		border-color: var(--hair);
 	}
 </style>

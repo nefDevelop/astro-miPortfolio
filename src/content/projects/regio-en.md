@@ -29,3 +29,6 @@ I implemented a centralized authentication system that acts as a digital checkpo
 
 ## Impact
 reGIO enables secure service exposure via a binary under 15MB, typically consuming less than **20MB of RAM**. It is the ideal solution for self-hosted environments that prioritize security without sacrificing performance.
+
+## What I learned
+reGIO taught me to think like someone attacking the service rather than configuring it: almost every layer was born from imagining how the one before it would be bypassed. And that in security the threat is not only the attacker but complexity: every measure you add is another piece to keep up to date, and a small binary you deploy in minutes is more defensible than a heavy stack nobody updates.
