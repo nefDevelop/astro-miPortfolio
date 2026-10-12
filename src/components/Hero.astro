@@ -31,9 +31,11 @@ const t = ui[lang];
 				    Es un SVG con `shape-rendering="crispEdges"` y geometría entera: con
 				    líneas de 1px hechas con bordes CSS y posicionadas en fracciones de
 				    píxel, el navegador las difuminaba a 100% y el conjunto parecía un
-				    cuadrado borroso. El SVG desactiva el suavizado y las mantiene duras. */}
+				    cuadrado borroso. El SVG desactiva el suavizado y las mantiene duras.
+				    El offset va en `em` para que escale con el titular (6xl → 7rem)
+				    y la cruz aterrice junto al punto en todos los tamaños. */}
 				<span
-					class="landing-pad pointer-events-none absolute bottom-[2px] left-6 hidden text-dot lg:block"
+					class="landing-pad pointer-events-none absolute bottom-[0.03em] left-[0.35em] block text-dot"
 					aria-hidden="true"
 				>
 					<svg
