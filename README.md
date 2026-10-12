@@ -95,7 +95,6 @@ que usan los controles.
       el botón `liveDemo` sale solo si tiene valor.
 - [ ] Decidir la captura de cabecera de reGIO: `regio-main.png` es la pantalla de login.
       Hay 5 capturas sin usar en `src/assets/` (`regio-admin-2/3`, `regio-profile-1/2/3`).
-- [ ] Sustituir las capturas marcadas con `TODO(captura)` en `src/data/portfolio.ts`:
-      los destacados `gaveoc`, `galowe` y `gevop` usan de momento material de otros
-      proyectos como marcador de posición, y en la rejilla lo necesitan `riceway`,
-      `planns`, `sGound` y `ggit`. Las de `PactRust`, `RecipeNode` y `gorrson` ya son reales.
+- [x] Sustituir las capturas marcadas con `TODO(captura)` en `src/data/portfolio.ts`:
+      `planns-main.png` y `sgound-main.png` ya son pantallas reales verificadas.
+      Todas las capturas de destacados y rejilla son del propio proyecto.

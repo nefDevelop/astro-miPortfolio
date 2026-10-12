@@ -22,7 +22,7 @@ Everything sensitive is encrypted on the client before leaving the device. The `
 Pact encrypts secrets, not metadata: the server still observes structure (account counts, favorites, timestamps) and file-level encryption of the `.pact` container is pending. That is documented in the README instead of hidden.
 
 ### Outcome
-Around 14,000 lines — 8,100 of Rust and 5,900 of frontend — with 8 test files in the core. One vault opens identically on desktop and web, and the server never holds anything it could read it with.
+One vault opens identically on desktop and web, and the server never holds anything it could read it with.
 
 ## Takeaway
 Pact taught me that end-to-end encryption is not a feature but a discipline about what each party sees: every new field forces the question of whether the server needs to see it. And that honesty about limits (visible metadata, unencrypted container) is part of security design, not an appendix.

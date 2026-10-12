@@ -298,7 +298,7 @@ const projectsEs: Project[] = [
     slides: [
       {
         title: "Conversión propia",
-        desc: "Motor de conversión con 14 formatos de entrada y 8 de salida, y un parser de MOBI y PalmDB escrito desde cero, compresor PalmDOC incluido.",
+        desc: "Motor de conversión con 11 formatos de entrada y 7 de salida, y un parser de MOBI y PalmDB escrito desde cero, compresor PalmDOC incluido.",
         image: galoweExports,
         imageAlt: "Diálogo de conversión de Galowe a AZW3 con formatos de salida.",
         imagePosition: "object-top",
@@ -452,7 +452,7 @@ const projectsEn: Project[] = [
     slides: [
       {
         title: "In-house conversion",
-        desc: "A conversion engine with 14 input and 8 output formats, plus a MOBI and PalmDB parser written from scratch, PalmDOC compressor included.",
+        desc: "A conversion engine with 11 input and 7 output formats, plus a MOBI and PalmDB parser written from scratch, PalmDOC compressor included.",
         image: galoweExports,
         imageAlt: "Galowe conversion dialog to AZW3 with output formats.",
         imagePosition: "object-top",
@@ -526,9 +526,8 @@ export const projects = {
  * bajo los destacados. Aquí van los que aportan pero no necesitan una lámina
  * completa, en el orden en que aparecen.
  *
- * Capturas: las de PactRust, gorrson y RecipeNode son reales; planns,
- * sGound y ggit usan material del propio proyecto o un marcador
- * `TODO(captura)` hasta que existan las pantallas definitivas.
+ * Capturas: todas son pantallas reales del propio proyecto
+ * (verificadas en `src/assets/`).
  */
 export interface OtherProject {
   title: string;
@@ -565,9 +564,8 @@ const otherEs: OtherProject[] = [
     type: "06 / Geometría",
     desc: "Diseñador de planos de vivienda con geometría computacional real, cálculo de superficies y presupuesto según normativa.",
     stack: ["Go", "Svelte", "Three.js"],
-    // TODO(captura): sustituir por un plano real con la vista 3D.
     image: plannsHero,
-    imageAlt: "Ilustración de planns.",
+    imageAlt: "Plano de vivienda en planns con cálculo de superficies y presupuesto.",
     imagePosition: "object-top",
     github: "https://github.com/nefDevelop/planns",
   },
@@ -576,11 +574,10 @@ const otherEs: OtherProject[] = [
     highlight: "G",
     suffix: "ound",
     type: "07 / Música",
-    desc: "Servidor de música compatible con OpenSubsonic y transcodificación al vuelo, con escritura física de etiquetas en Go puro.",
+    desc: "Servidor de música con subset OpenSubsonic (21 vistas) y transcodificación al vuelo, con escritura física de etiquetas en Go puro.",
     stack: ["Go", "Svelte", "SQLite", "OpenSubsonic"],
-    // TODO(captura): sustituir por la biblioteca de sGound.
     image: sgoundImageMain,
-    imageAlt: "Captura pendiente de sGound.",
+    imageAlt: "Biblioteca de sGound con panel, descubrimiento y reproductor.",
     imagePosition: "object-top",
     github: "https://github.com/nefDevelop/sGound",
   },
@@ -626,9 +623,8 @@ const otherEn: OtherProject[] = [
     type: "06 / Geometry",
     desc: "A floor plan designer with real computational geometry, surface calculation and budgeting against building regulations.",
     stack: ["Go", "Svelte", "Three.js"],
-    // TODO(captura): sustituir por un plano real con la vista 3D.
     image: plannsHero,
-    imageAlt: "planns illustration.",
+    imageAlt: "Floor plan in planns with surface calculation and budgeting.",
     imagePosition: "object-top",
     github: "https://github.com/nefDevelop/planns",
   },
@@ -637,11 +633,10 @@ const otherEn: OtherProject[] = [
     highlight: "G",
     suffix: "ound",
     type: "07 / Music",
-    desc: "An OpenSubsonic-compatible music server with on-the-fly transcoding and physical tag writing in pure Go.",
+    desc: "A music server with an OpenSubsonic subset (21 views) and on-the-fly transcoding and physical tag writing in pure Go.",
     stack: ["Go", "Svelte", "SQLite", "OpenSubsonic"],
-    // TODO(captura): sustituir por la biblioteca de sGound.
     image: sgoundImageMain,
-    imageAlt: "sGound screenshot pending.",
+    imageAlt: "sGound library with dashboard, discovery and player.",
     imagePosition: "object-top",
     github: "https://github.com/nefDevelop/sGound",
   },

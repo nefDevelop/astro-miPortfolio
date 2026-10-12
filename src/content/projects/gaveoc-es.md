@@ -21,7 +21,7 @@ Un único binario de Go sirve el backend y el frontend. La captura combina **Obe
 - **Interfaz:** Material You 3 y Adwaita, modo claro y oscuro, esqueletos de carga y avisos.
 
 ### Resultado
-28.300 líneas de código, de las que más de la mitad son tests: 67 ficheros y 617 funciones, con **45 rutas documentadas en Swagger**. El despliegue se reduce a un binario y una base de datos SQLite.
+El despliegue se reduce a un binario y una base de datos SQLite, con API documentada en Swagger.
 
 ## Aprendizaje
 Gaveoc fue el proyecto donde la separación por capas dejó de ser teoría. Mantener cuatro superficies de entrega sobre un mismo núcleo obliga a que el dominio no dependa de ninguna de ellas, y a que todo lo específico de cada plataforma viva en su adaptador. La parte más costosa no fue archivar, sino conseguir que lo archivado siguiera siendo legible.

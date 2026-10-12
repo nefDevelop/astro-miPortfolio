@@ -21,7 +21,7 @@ A single Go binary serves both the backend and the frontend. Capture combines **
 - **Interface:** Material You 3 and Adwaita, light and dark mode, loading skeletons and toasts.
 
 ### Result
-28,300 lines of code, over half of them tests: 67 files and 617 functions, with **45 routes documented in Swagger**. Deployment is just one binary and a SQLite database.
+Deployment is just one binary and a SQLite database, with a Swagger-documented API.
 
 ## What I learned
 Gaveoc is the project where layered separation stopped being theory. Keeping four delivery surfaces on top of one core forces the domain to depend on none of them and pushes everything platform-specific into its adapter. The hardest part was not archiving, but keeping what was archived readable.

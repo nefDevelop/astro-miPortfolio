@@ -22,7 +22,7 @@ Todo lo sensible se cifra en el cliente antes de salir del dispositivo. La `Mast
 Pact cifra los secretos, no los metadatos: el servidor aún observa la estructura (número de cuentas, favoritos, marcas de tiempo) y el cifrado del contenedor `.pact` a nivel de archivo está pendiente. Está documentado en el README en vez de escondido.
 
 ### Resultado
-Unas 14.000 líneas —8.100 de Rust y 5.900 de frontend— con 8 ficheros de tests en el núcleo. Una sola bóveda se abre igual en escritorio y en web, y el servidor nunca tiene con qué leerla.
+Una sola bóveda se abre igual en escritorio y en web, y el servidor nunca tiene con qué leerla.
 
 ## Aprendizaje
 Pact me enseñó que el cifrado de extremo a extremo no es una función, sino una disciplina de qué ve cada pieza: cada campo nuevo obliga a preguntar si el servidor necesita verlo. Y que la honestidad sobre los límites (metadatos visibles, contenedor sin cifrar) forma parte del diseño de seguridad, no es un apéndice.
