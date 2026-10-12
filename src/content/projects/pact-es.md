@@ -18,6 +18,16 @@ Todo lo sensible se cifra en el cliente antes de salir del dispositivo. La `Mast
 - **Servidor ciego:** **Axum** + SQLx; el servidor persiste y sirve iconos con allowlist, pero jamás ve un secreto en claro.
 - **Interfaz:** **Tauri v2** + **Svelte 5** con Material Design 3, paleta tonal derivada del color del usuario y bilingüe español/inglés.
 
+### Flujo de extremo a extremo
+
+```mermaid
+flowchart TD
+    A[Cliente: navegador o escritorio] --> B[Argon2id deriva MasterKey y AuthKey]
+    B --> C[Cifra los secretos con AES-256-GCM]
+    C --> D[Servidor Axum guarda blobs sin descifrar]
+    D --> E[SQLite local o MariaDB remota]
+```
+
 ### Límites conocidos
 Pact cifra los secretos, no los metadatos: el servidor aún observa la estructura (número de cuentas, favoritos, marcas de tiempo) y el cifrado del contenedor `.pact` a nivel de archivo está pendiente. Está documentado en el README en vez de escondido.
 

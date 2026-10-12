@@ -18,6 +18,16 @@ Everything sensitive is encrypted on the client before leaving the device. The `
 - **Blind server:** **Axum** + SQLx; the server persists data and serves icons through an allowlist, but never sees a secret in the clear.
 - **Interface:** **Tauri v2** + **Svelte 5** with Material Design 3, a tonal palette derived from the user's color, and Spanish/English i18n.
 
+### End-to-end flow
+
+```mermaid
+flowchart TD
+    A[Client: browser or desktop] --> B[Argon2id derives MasterKey and AuthKey]
+    B --> C[Encrypt secrets with AES-256-GCM]
+    C --> D[Axum server stores blobs without decrypting]
+    D --> E[Local SQLite or remote MariaDB]
+```
+
 ### Known limits
 Pact encrypts secrets, not metadata: the server still observes structure (account counts, favorites, timestamps) and file-level encryption of the `.pact` container is pending. That is documented in the README instead of hidden.
 

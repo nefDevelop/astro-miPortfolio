@@ -40,7 +40,7 @@ export const personalInfo = {
 // Posicionamiento: es la frase que un reclutador lee en los primeros 6 segundos,
 // así que vive en los datos y no en la plantilla.
 export const positioning = {
-  stack: ["TypeScript", "Node.js", "Go", "Svelte", "Astro"],
+  stack: [ "Go", "Svelte", "TypeScript", "SQLite"],
 };
 
 /**
@@ -574,7 +574,7 @@ const otherEs: OtherProject[] = [
     highlight: "G",
     suffix: "ound",
     type: "07 / Música",
-    desc: "Servidor de música con subset OpenSubsonic (21 vistas) y transcodificación al vuelo, con escritura física de etiquetas en Go puro.",
+    desc: "Servidor de música con subset OpenSubsonic (21 vistas) y transcodificación al vuelo, con escritura física de etiquetas (Go puro en MP3/FLAC, FFmpeg en el resto).",
     stack: ["Go", "Svelte", "SQLite", "OpenSubsonic"],
     image: sgoundImageMain,
     imageAlt: "Biblioteca de sGound con panel, descubrimiento y reproductor.",
@@ -633,7 +633,7 @@ const otherEn: OtherProject[] = [
     highlight: "G",
     suffix: "ound",
     type: "07 / Music",
-    desc: "A music server with an OpenSubsonic subset (21 views) and on-the-fly transcoding and physical tag writing in pure Go.",
+    desc: "A music server with an OpenSubsonic subset (21 views) and on-the-fly transcoding and physical tag writing (pure Go for MP3/FLAC, FFmpeg for the rest).",
     stack: ["Go", "Svelte", "SQLite", "OpenSubsonic"],
     image: sgoundImageMain,
     imageAlt: "sGound library with dashboard, discovery and player.",

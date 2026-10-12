@@ -22,18 +22,18 @@ const leer = (rel) => {
   return fs.readFileSync(ruta, 'utf8');
 };
 
-const recipe = leer('es/projects/recipenode/index.html');
-const recipeEn = leer('en/projects/recipenode/index.html');
+const pact = leer('es/projects/pact/index.html');
+const pactEn = leer('en/projects/pact/index.html');
 const regio = leer('es/projects/regio/index.html');
 
 // El bloque existe y conserva el fuente: es el fallback sin JS.
-check(/<code class="language-mermaid">/.test(recipe), 'recipenode (es) trae <code class="language-mermaid">');
-check(/<code class="language-mermaid">/.test(recipeEn), 'recipenode (en) trae <code class="language-mermaid">');
-check(/chokidar/.test(recipe), 'el fuente del diagrama llega al HTML (fallback sin JS)');
+check(/<code class="language-mermaid">/.test(pact), 'pact (es) trae <code class="language-mermaid">');
+check(/<code class="language-mermaid">/.test(pactEn), 'pact (en) trae <code class="language-mermaid">');
+check(/Argon2id/.test(pact), 'el fuente del diagrama llega al HTML (fallback sin JS)');
 
 // Shiki no debe haber tocado el bloque: si lo envuelve en astro-code, el
 // selector del script no lo encuentra.
-const m = /<pre([^>]*)><code class="language-mermaid">/.exec(recipe);
+const m = /<pre([^>]*)><code class="language-mermaid">/.exec(pact);
 check(Boolean(m), 'el bloque vive dentro de un <pre> directo');
 check(Boolean(m) && !/astro-code/.test(m[1]), 'el <pre> no está resaltado por Shiki (sin clase astro-code)');
 
